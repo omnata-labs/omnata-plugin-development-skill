@@ -155,7 +155,7 @@ errors defaults to 'strict'.
 
 ---
 
-# Models
+# Pydantic Models
 
 ## InboundConfigurationFormPayload
 **Import:** `from omnata_plugin_runtime.api import InboundConfigurationFormPayload`  
@@ -168,12 +168,12 @@ Encapsulates the payload that is sent to the plugin when it is invoked to provid
 | `connectivity_option` | `ConnectivityOption` | no | `direct` |  |  |
 | `connection_method` | `str` | yes |  |  |  |
 | `connection_parameters` | `dict` | yes |  |  |  |
-| `oauth_secret_name` | `str` \| None | no | `None` |  |  |
-| `other_secrets_name` | `str` \| None | no | `None` |  |  |
+| `oauth_secret_name` | `Union[str, None]` | no | `None` |  |  |
+| `other_secrets_name` | `Union[str, None]` | no | `None` |  |  |
 | `sync_direction` | `str` | no | `inbound` |  |  |
 | `function_name` | `str` | no | `inbound_configuration_form` |  |  |
 | `sync_parameters` | `dict` | yes |  |  |  |
-| `current_form_parameters` | `dict` \| None | yes |  |  |  |
+| `current_form_parameters` | `Union[dict, None]` | yes |  |  |  |
 
 ---
 
@@ -187,7 +187,7 @@ Encapsulates the payload that is sent to the plugin when it is invoked to perfor
 |-------|------|----------|---------|-------------|-------------|
 | `sync_id` | `int` | yes |  |  |  |
 | `sync_branch_name` | `str` | no | `main` |  |  |
-| `sync_branch_id` | `int` \| None | no | `None` |  |  |
+| `sync_branch_id` | `Union[int, None]` | no | `None` |  |  |
 | `connection_id` | `int` | yes |  |  |  |
 | `run_id` | `int` | yes |  |  |  |
 | `source_app_name` | `str` | yes |  |  |  |
@@ -197,11 +197,11 @@ Encapsulates the payload that is sent to the plugin when it is invoked to perfor
 | `connection_method` | `str` | yes |  |  |  |
 | `connectivity_option` | `ConnectivityOption` | no | `direct` |  |  |
 | `connection_parameters` | `dict` | yes |  |  |  |
-| `oauth_secret_name` | `str` \| None | no | `None` |  |  |
-| `other_secrets_name` | `str` \| None | no | `None` |  |  |
+| `oauth_secret_name` | `Union[str, None]` | no | `None` |  |  |
+| `other_secrets_name` | `Union[str, None]` | no | `None` |  |  |
 | `sync_direction` | `str` | no | `inbound` |  |  |
 | `sync_parameters` | `dict` | yes |  |  |  |
-| `api_limit_overrides` | list[`ApiLimits`] | yes |  |  |  |
+| `api_limit_overrides` | `list[ApiLimits]` | yes |  |  |  |
 | `rate_limits_state` | `dict` | yes |  |  |  |
 | `streams_configuration` | `InboundSyncStreamsConfiguration` | yes |  |  |  |
 | `latest_stream_state` | `dict` | yes |  |  |  |
@@ -220,14 +220,14 @@ Encapsulates the payload that is sent to the plugin when it is invoked to provid
 | `connectivity_option` | `ConnectivityOption` | no | `direct` |  |  |
 | `connection_method` | `str` | yes |  |  |  |
 | `connection_parameters` | `dict` | yes |  |  |  |
-| `oauth_secret_name` | `str` \| None | no | `None` |  |  |
-| `other_secrets_name` | `str` \| None | no | `None` |  |  |
+| `oauth_secret_name` | `Union[str, None]` | no | `None` |  |  |
+| `other_secrets_name` | `Union[str, None]` | no | `None` |  |  |
 | `sync_direction` | `str` | no | `outbound` |  |  |
-| `target_type` | `str` \| None | no | `None` |  |  |
+| `target_type` | `Union[str, None]` | no | `None` |  |  |
 | `sync_strategy` | `OutboundSyncStrategy` | yes |  |  |  |
 | `function_name` | `str` | no | `outbound_configuration_form` |  |  |
 | `sync_parameters` | `dict` | yes |  |  |  |
-| `current_form_parameters` | `dict` \| None | yes |  |  |  |
+| `current_form_parameters` | `Union[dict, None]` | yes |  |  |  |
 
 ---
 
@@ -241,7 +241,7 @@ Encapsulates the payload that is sent to the plugin when it is invoked to perfor
 |-------|------|----------|---------|-------------|-------------|
 | `sync_id` | `int` | yes |  |  |  |
 | `sync_branch_name` | `str` | no | `main` |  |  |
-| `sync_branch_id` | `int` \| None | yes |  |  |  |
+| `sync_branch_id` | `Union[int, None]` | yes |  |  |  |
 | `connection_id` | `int` | yes |  |  |  |
 | `run_id` | `int` | yes |  |  |  |
 | `source_app_name` | `str` | yes |  |  |  |
@@ -251,17 +251,17 @@ Encapsulates the payload that is sent to the plugin when it is invoked to perfor
 | `results_table_name` | `str` | yes |  |  |  |
 | `logging_level` | `str` | yes |  |  |  |
 | `connection_method` | `str` | yes |  |  |  |
-| `target_type` | `str` \| None | no | `None` |  |  |
+| `target_type` | `Union[str, None]` | no | `None` |  |  |
 | `connectivity_option` | `ConnectivityOption` | no | `direct` |  |  |
 | `connection_parameters` | `dict` | yes |  |  |  |
-| `oauth_secret_name` | `str` \| None | no | `None` |  |  |
-| `other_secrets_name` | `str` \| None | no | `None` |  |  |
+| `oauth_secret_name` | `Union[str, None]` | no | `None` |  |  |
+| `other_secrets_name` | `Union[str, None]` | no | `None` |  |  |
 | `sync_direction` | `str` | no | `outbound` |  |  |
 | `sync_strategy` | `OutboundSyncStrategy` | yes |  |  |  |
 | `sync_parameters` | `dict` | yes |  |  |  |
-| `api_limit_overrides` | list[`ApiLimits`] | yes |  |  |  |
+| `api_limit_overrides` | `list[ApiLimits]` | yes |  |  |  |
 | `rate_limits_state` | `dict` | yes |  |  |  |
-| `field_mappings` | `StoredJinjaTemplate` \| `StoredFieldMappings` \| None | no | `None` |  |  |
+| `field_mappings` | `Union[Union[StoredJinjaTemplate, StoredFieldMappings], None]` | no | `None` |  |  |
 | `time_limit_mins` | `int` | no | `240` |  |  |
 
 ---
@@ -275,7 +275,7 @@ Updates the list of abandoned streams for a sync run
 | Field | Type | Required | Default | Constraints | Description |
 |-------|------|----------|---------|-------------|-------------|
 | `message_type` | `str` | no | `abandoned_streams` |  |  |
-| `abandoned_streams` | list[`str`] | yes |  |  |  |
+| `abandoned_streams` | `list[str]` | yes |  |  |  |
 
 ---
 
@@ -288,7 +288,7 @@ Updates the list of cancelled streams for a sync run
 | Field | Type | Required | Default | Constraints | Description |
 |-------|------|----------|---------|-------------|-------------|
 | `message_type` | `str` | no | `cancelled_streams` |  |  |
-| `cancelled_streams` | list[`str`] | yes |  |  |  |
+| `cancelled_streams` | `list[str]` | yes |  |  |  |
 
 ---
 
@@ -328,9 +328,9 @@ Updates the record counts and completed streams for a sync run
 |-------|------|----------|---------|-------------|-------------|
 | `message_type` | `str` | no | `stream_record_counts` |  |  |
 | `stream_total_counts` | `dict` | yes |  |  |  |
-| `completed_streams` | list[`str`] | yes |  |  |  |
-| `stream_errors` | `dict` \| None | no | `None` |  |  |
-| `total_records_estimate` | `dict` \| None | no | `None` |  |  |
+| `completed_streams` | `list[str]` | yes |  |  |  |
+| `stream_errors` | `Union[dict, None]` | no | `None` |  |  |
+| `total_records_estimate` | `Union[dict, None]` | no | `None` |  |  |
 
 ---
 
@@ -358,10 +358,10 @@ This acts as a base class since connection parameters are the first things colle
 |-------|------|----------|---------|-------------|-------------|
 | `connection_method` | `str` | yes |  |  |  |
 | `connectivity_option` | `ConnectivityOption` | no | `direct` |  |  |
-| `connection_parameters` | `dict` \| None | no | `None` |  |  |
-| `connection_secrets` | `dict` \| None | no | `None` |  |  |
-| `ngrok_tunnel_settings` | `NgrokTunnelSettings` \| None | no | `None` |  |  |
-| `access_token_secret_name` | `str` \| None | no | `None` |  |  |
+| `connection_parameters` | `Union[dict, None]` | no | `None` |  |  |
+| `connection_secrets` | `Union[dict, None]` | no | `None` |  |  |
+| `ngrok_tunnel_settings` | `Union[NgrokTunnelSettings, None]` | no | `None` |  |  |
+| `access_token_secret_name` | `Union[str, None]` | no | `None` |  |  |
 
 ---
 
@@ -392,10 +392,10 @@ Record creation -> CreateSyncAction
 | `name` | `str` | yes |  |  |  |
 | `description` | `str` | yes |  |  |  |
 | `icon_source` | `str` | no | `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24"><path fill="currentColor" d="m8 18l-6-6l6-6l1.425 1.425l-4.6 4.6L9.4 16.6Zm8 0l-1.425-1.425l4.6-4.6L14.6 7.4L16 6l6 6Z"/></svg>` |  |  |
-| `action_on_record_create` | `OutboundSyncAction` \| None | no | `None` |  |  |
-| `action_on_record_update` | `OutboundSyncAction` \| None | no | `None` |  |  |
-| `action_on_record_delete` | `OutboundSyncAction` \| None | no | `None` |  |  |
-| `action_on_record_unchanged` | `OutboundSyncAction` \| None | no | `None` |  |  |
+| `action_on_record_create` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
+| `action_on_record_update` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
+| `action_on_record_delete` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
+| `action_on_record_unchanged` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
 | `custom_strategy` | `bool` | no | `True` |  |  |
 
 ---
@@ -427,10 +427,10 @@ Record deletion -> DeleteSyncAction
 | `name` | `str` | yes |  |  |  |
 | `description` | `str` | yes |  |  |  |
 | `icon_source` | `str` | no | `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24"><path fill="currentColor" d="m8 18l-6-6l6-6l1.425 1.425l-4.6 4.6L9.4 16.6Zm8 0l-1.425-1.425l4.6-4.6L14.6 7.4L16 6l6 6Z"/></svg>` |  |  |
-| `action_on_record_create` | `OutboundSyncAction` \| None | no | `None` |  |  |
-| `action_on_record_update` | `OutboundSyncAction` \| None | no | `None` |  |  |
-| `action_on_record_delete` | `OutboundSyncAction` \| None | no | `None` |  |  |
-| `action_on_record_unchanged` | `OutboundSyncAction` \| None | no | `None` |  |  |
+| `action_on_record_create` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
+| `action_on_record_update` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
+| `action_on_record_delete` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
+| `action_on_record_unchanged` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
 | `custom_strategy` | `bool` | no | `True` |  |  |
 
 ---
@@ -451,13 +451,13 @@ the requested streams.
 |-------|------|----------|---------|-------------|-------------|
 | `connection_method` | `str` | yes |  |  |  |
 | `connectivity_option` | `ConnectivityOption` | no | `direct` |  |  |
-| `connection_parameters` | `dict` \| None | no | `None` |  |  |
-| `connection_secrets` | `dict` \| None | no | `None` |  |  |
-| `ngrok_tunnel_settings` | `NgrokTunnelSettings` \| None | no | `None` |  |  |
-| `access_token_secret_name` | `str` \| None | no | `None` |  |  |
-| `sync_parameters` | `dict` \| None | no | `None` |  |  |
-| `current_form_parameters` | `dict` \| None | no | `None` |  |  |
-| `currently_selected_streams` | list[`str`] \| None | no | `None` |  |  |
+| `connection_parameters` | `Union[dict, None]` | no | `None` |  |  |
+| `connection_secrets` | `Union[dict, None]` | no | `None` |  |  |
+| `ngrok_tunnel_settings` | `Union[NgrokTunnelSettings, None]` | no | `None` |  |  |
+| `access_token_secret_name` | `Union[str, None]` | no | `None` |  |  |
+| `sync_parameters` | `Union[dict, None]` | no | `None` |  |  |
+| `current_form_parameters` | `Union[dict, None]` | no | `None` |  |  |
+| `currently_selected_streams` | `Union[list[str], None]` | no | `None` |  |  |
 
 ---
 
@@ -471,13 +471,13 @@ as well as which ones were excluded and how to treat newly discovered objects
 | Field | Type | Required | Default | Constraints | Description |
 |-------|------|----------|---------|-------------|-------------|
 | `include_new_streams` | `bool` | yes |  |  |  |
-| `new_stream_sync_strategy` | `InboundSyncStrategy` \| None | no | `None` |  |  |
-| `new_stream_storage_behaviour` | `InboundStorageBehaviour` \| None | no | `None` |  |  |
+| `new_stream_sync_strategy` | `Union[InboundSyncStrategy, None]` | no | `None` |  |  |
+| `new_stream_storage_behaviour` | `Union[InboundStorageBehaviour, None]` | no | `None` |  |  |
 | `included_streams` | `dict` | yes |  |  |  |
-| `excluded_streams` | list[`str`] | yes |  |  |  |
-| `bulk_configuration` | `InboundSyncBulkConfiguration` \| None | no | `None` |  |  |
-| `sync_strategy_bulk_configuration` | `InboundSyncStrategyBulkConfiguration` \| None | no | `None` |  |  |
-| `storage_behaviour_bulk_configuration` | `InboundStorageBehaviourBulkConfiguration` \| None | no | `None` |  |  |
+| `excluded_streams` | `list[str]` | yes |  |  |  |
+| `bulk_configuration` | `Union[InboundSyncBulkConfiguration, None]` | no | `None` |  |  |
+| `sync_strategy_bulk_configuration` | `Union[InboundSyncStrategyBulkConfiguration, None]` | no | `None` |  |  |
+| `storage_behaviour_bulk_configuration` | `Union[InboundStorageBehaviourBulkConfiguration, None]` | no | `None` |  |  |
 
 ---
 
@@ -495,10 +495,10 @@ Record delete -> DeleteSyncAction
 | `name` | `str` | yes |  |  |  |
 | `description` | `str` | yes |  |  |  |
 | `icon_source` | `str` | no | `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24"><path fill="currentColor" d="m8 18l-6-6l6-6l1.425 1.425l-4.6 4.6L9.4 16.6Zm8 0l-1.425-1.425l4.6-4.6L14.6 7.4L16 6l6 6Z"/></svg>` |  |  |
-| `action_on_record_create` | `OutboundSyncAction` \| None | no | `None` |  |  |
-| `action_on_record_update` | `OutboundSyncAction` \| None | no | `None` |  |  |
-| `action_on_record_delete` | `OutboundSyncAction` \| None | no | `None` |  |  |
-| `action_on_record_unchanged` | `OutboundSyncAction` \| None | no | `None` |  |  |
+| `action_on_record_create` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
+| `action_on_record_update` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
+| `action_on_record_delete` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
+| `action_on_record_unchanged` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
 | `custom_strategy` | `bool` | no | `True` |  |  |
 
 ---
@@ -511,8 +511,8 @@ Represents a mix of direct access and privatelink addresses
 
 | Field | Type | Required | Default | Constraints | Description |
 |-------|------|----------|---------|-------------|-------------|
-| `direct` | list[`str`] \| None | no | `None` |  | A list of addresses that can be accessed directly |
-| `privatelink` | list[`str`] \| None | no | `None` |  | A list of addresses that require privatelink access |
+| `direct` | `Union[list[str], None]` | no | `None` |  | A list of addresses that can be accessed directly |
+| `privatelink` | `Union[list[str], None]` | no | `None` |  | A list of addresses that require privatelink access |
 
 ---
 
@@ -576,15 +576,15 @@ Contains user-provided information completed during outbound connection/sync con
 |-------|------|----------|---------|-------------|-------------|
 | `connection_method` | `str` | yes |  |  |  |
 | `connectivity_option` | `ConnectivityOption` | no | `direct` |  |  |
-| `connection_parameters` | `dict` \| None | no | `None` |  |  |
-| `connection_secrets` | `dict` \| None | no | `None` |  |  |
-| `ngrok_tunnel_settings` | `NgrokTunnelSettings` \| None | no | `None` |  |  |
-| `access_token_secret_name` | `str` \| None | no | `None` |  |  |
-| `sync_parameters` | `dict` \| None | no | `None` |  |  |
-| `current_form_parameters` | `dict` \| None | no | `None` |  |  |
-| `target_type` | `str` \| None | no | `None` |  | The label of the OutboundTargetType selected by the user |
-| `sync_strategy` | `OutboundSyncStrategy` \| None | no | `None` |  |  |
-| `field_mappings` | `StoredJinjaTemplate` \| `StoredFieldMappings` \| None | no | `None` |  |  |
+| `connection_parameters` | `Union[dict, None]` | no | `None` |  |  |
+| `connection_secrets` | `Union[dict, None]` | no | `None` |  |  |
+| `ngrok_tunnel_settings` | `Union[NgrokTunnelSettings, None]` | no | `None` |  |  |
+| `access_token_secret_name` | `Union[str, None]` | no | `None` |  |  |
+| `sync_parameters` | `Union[dict, None]` | no | `None` |  |  |
+| `current_form_parameters` | `Union[dict, None]` | no | `None` |  |  |
+| `target_type` | `Union[str, None]` | no | `None` |  | The label of the OutboundTargetType selected by the user |
+| `sync_strategy` | `Union[OutboundSyncStrategy, None]` | no | `None` |  |  |
+| `field_mappings` | `Union[Union[StoredJinjaTemplate, StoredFieldMappings], None]` | no | `None` |  |  |
 
 ---
 
@@ -604,10 +604,10 @@ and publishing events.
 | `name` | `str` | yes |  |  |  |
 | `description` | `str` | yes |  |  |  |
 | `icon_source` | `str` | no | `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24"><path fill="currentColor" d="m8 18l-6-6l6-6l1.425 1.425l-4.6 4.6L9.4 16.6Zm8 0l-1.425-1.425l4.6-4.6L14.6 7.4L16 6l6 6Z"/></svg>` |  |  |
-| `action_on_record_create` | `OutboundSyncAction` \| None | no | `None` |  |  |
-| `action_on_record_update` | `OutboundSyncAction` \| None | no | `None` |  |  |
-| `action_on_record_delete` | `OutboundSyncAction` \| None | no | `None` |  |  |
-| `action_on_record_unchanged` | `OutboundSyncAction` \| None | no | `None` |  |  |
+| `action_on_record_create` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
+| `action_on_record_update` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
+| `action_on_record_delete` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
+| `action_on_record_unchanged` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
 | `custom_strategy` | `bool` | no | `True` |  |  |
 
 ---
@@ -644,8 +644,8 @@ The target type cannot be changed after the sync is created.
 | Field | Type | Required | Default | Constraints | Description |
 |-------|------|----------|---------|-------------|-------------|
 | `label` | `str` | yes |  |  |  |
-| `supported_strategies` | list[`str`] | yes |  |  |  |
-| `target_parameter` | `OutboundTargetParameter` \| None | no | `None` |  |  |
+| `supported_strategies` | `list[str]` | yes |  |  |  |
+| `target_parameter` | `Union[OutboundTargetParameter, None]` | no | `None` |  |  |
 
 ---
 
@@ -680,10 +680,10 @@ Record unchanged -> RecreateSyncAction
 | `name` | `str` | yes |  |  |  |
 | `description` | `str` | yes |  |  |  |
 | `icon_source` | `str` | no | `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24"><path fill="currentColor" d="m8 18l-6-6l6-6l1.425 1.425l-4.6 4.6L9.4 16.6Zm8 0l-1.425-1.425l4.6-4.6L14.6 7.4L16 6l6 6Z"/></svg>` |  |  |
-| `action_on_record_create` | `OutboundSyncAction` \| None | no | `None` |  |  |
-| `action_on_record_update` | `OutboundSyncAction` \| None | no | `None` |  |  |
-| `action_on_record_delete` | `OutboundSyncAction` \| None | no | `None` |  |  |
-| `action_on_record_unchanged` | `OutboundSyncAction` \| None | no | `None` |  |  |
+| `action_on_record_create` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
+| `action_on_record_update` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
+| `action_on_record_delete` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
+| `action_on_record_unchanged` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
 | `custom_strategy` | `bool` | no | `True` |  |  |
 
 ---
@@ -716,10 +716,10 @@ Record creation -> SendSyncAction
 | `name` | `str` | yes |  |  |  |
 | `description` | `str` | yes |  |  |  |
 | `icon_source` | `str` | no | `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24"><path fill="currentColor" d="m8 18l-6-6l6-6l1.425 1.425l-4.6 4.6L9.4 16.6Zm8 0l-1.425-1.425l4.6-4.6L14.6 7.4L16 6l6 6Z"/></svg>` |  |  |
-| `action_on_record_create` | `OutboundSyncAction` \| None | no | `None` |  |  |
-| `action_on_record_update` | `OutboundSyncAction` \| None | no | `None` |  |  |
-| `action_on_record_delete` | `OutboundSyncAction` \| None | no | `None` |  |  |
-| `action_on_record_unchanged` | `OutboundSyncAction` \| None | no | `None` |  |  |
+| `action_on_record_create` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
+| `action_on_record_update` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
+| `action_on_record_delete` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
+| `action_on_record_unchanged` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
 | `custom_strategy` | `bool` | no | `True` |  |  |
 
 ---
@@ -764,7 +764,7 @@ It contains either a list of mappings or a jinja template
 | Field | Type | Required | Default | Constraints | Description |
 |-------|------|----------|---------|-------------|-------------|
 | `mapper_type` | `str` | no | `field_mapping_selector` |  |  |
-| `field_mappings` | list[`StoredFieldMapping`] | yes |  |  |  |
+| `field_mappings` | `list[StoredFieldMapping]` | yes |  |  |  |
 
 ---
 
@@ -794,8 +794,8 @@ This information is parsed from the metadata of the streams Sync config object, 
 |-------|------|----------|---------|-------------|-------------|
 | `stream_name` | `str` | yes |  |  |  |
 | `sync_strategy` | `InboundSyncStrategy` | yes |  |  |  |
-| `cursor_field` | `str` \| None | no | `None` |  | The field to use as a cursor |
-| `primary_key_field` | `str` \| list[`str`] \| None | no | `None` |  | The field(s) that will be used as primary key. |
+| `cursor_field` | `Union[str, None]` | no | `None` |  | The field to use as a cursor |
+| `primary_key_field` | `Union[str, list[str], None]` | no | `None` |  | The field(s) that will be used as primary key. |
 | `storage_behaviour` | `InboundStorageBehaviour` | yes |  |  |  |
 | `stream` | `StreamConfiguration` | yes |  |  |  |
 | `latest_state` | `dict` | no |  |  | The latest state of the stream, used for incremental syncs |
@@ -812,14 +812,14 @@ Derived from the Airbyte protocol, with minor tweaks to suit our differences.
 | Field | Type | Required | Default | Constraints | Description |
 |-------|------|----------|---------|-------------|-------------|
 | `stream_name` | `str` | yes |  |  |  |
-| `supported_sync_strategies` | list[`InboundSyncStrategy`] | yes |  |  |  |
-| `source_defined_cursor` | `bool` \| None | no | `None` |  | If true, the plugin controls the cursor field |
-| `source_defined_primary_key` | `str` \| list[`str`] \| None | no | `None` |  | If defined, the plugin controls the primary key field |
-| `primary_key_can_be_composite` | `bool` \| None | no | `False` |  | If true, the primary key can be composite |
-| `default_cursor_field` | `str` \| None | no | `None` |  | The default field to use as a cursor |
-| `json_schema` | `dict` \| None | no | `None` |  | JSON Schema for objects provided by stream |
+| `supported_sync_strategies` | `list[InboundSyncStrategy]` | yes |  |  |  |
+| `source_defined_cursor` | `Union[bool, None]` | no | `None` |  | If true, the plugin controls the cursor field |
+| `source_defined_primary_key` | `Union[str, list[str], None]` | no | `None` |  | If defined, the plugin controls the primary key field |
+| `primary_key_can_be_composite` | `Union[bool, None]` | no | `False` |  | If true, the primary key can be composite |
+| `default_cursor_field` | `Union[str, None]` | no | `None` |  | The default field to use as a cursor |
+| `json_schema` | `Union[dict, None]` | no | `None` |  | JSON Schema for objects provided by stream |
 | `metadata` | `dict` | no |  |  | Metadata associated with the stream. Be careful not to include environment-specific information like GUIDs |
-| `depends_on_stream` | `str` \| None | no | `None` |  | Marks the stream as requiring another stream to be selected |
+| `depends_on_stream` | `Union[str, None]` | no | `None` |  | Marks the stream as requiring another stream to be selected |
 | `mandatory` | `bool` | no | `False` |  | Marks the stream as mandatory, meaning it cannot be excluded from the sync configuration |
 
 ---
@@ -844,12 +844,12 @@ A base class for Sync configuration parameters.
 |-------|------|----------|---------|-------------|-------------|
 | `connection_method` | `str` | yes |  |  |  |
 | `connectivity_option` | `ConnectivityOption` | no | `direct` |  |  |
-| `connection_parameters` | `dict` \| None | no | `None` |  |  |
-| `connection_secrets` | `dict` \| None | no | `None` |  |  |
-| `ngrok_tunnel_settings` | `NgrokTunnelSettings` \| None | no | `None` |  |  |
-| `access_token_secret_name` | `str` \| None | no | `None` |  |  |
-| `sync_parameters` | `dict` \| None | no | `None` |  |  |
-| `current_form_parameters` | `dict` \| None | no | `None` |  |  |
+| `connection_parameters` | `Union[dict, None]` | no | `None` |  |  |
+| `connection_secrets` | `Union[dict, None]` | no | `None` |  |  |
+| `ngrok_tunnel_settings` | `Union[NgrokTunnelSettings, None]` | no | `None` |  |  |
+| `access_token_secret_name` | `Union[str, None]` | no | `None` |  |  |
+| `sync_parameters` | `Union[dict, None]` | no | `None` |  |  |
+| `current_form_parameters` | `Union[dict, None]` | no | `None` |  |  |
 
 ---
 
@@ -874,11 +874,11 @@ Args:
 | `mode` | `str` | no | `dbt` |  |  |
 | `dbt_prod_target_name` | `str` | no | `prod` |  |  |
 | `task_warehouse_dbt_defined` | `bool` | no | `True` |  |  |
-| `warehouse` | `str` \| None | no | `None` |  |  |
+| `warehouse` | `Union[str, None]` | no | `None` |  |  |
 | `time_limit_mins` | `int` | no | `240` |  |  |
 | `dbt_dev_target_name` | `str` | no | `dev` |  |  |
 | `dbt_sync_model_name` | `str` | yes |  |  |  |
-| `dbt_source_model_name` | `str` \| None | no | `None` |  |  |
+| `dbt_source_model_name` | `Union[str, None]` | no | `None` |  |  |
 | `is_dbt_cloud` | `bool` | no | `True` |  |  |
 
 ---
@@ -899,7 +899,7 @@ Args:
 |-------|------|----------|---------|-------------|-------------|
 | `mode` | `str` | no | `dependent` |  |  |
 | `run_when` | `str` | no | `after_parent_completes` |  |  |
-| `warehouse` | `str` \| None | no | `None` |  |  |
+| `warehouse` | `Union[str, None]` | no | `None` |  |  |
 | `time_limit_mins` | `int` | no | `240` |  |  |
 | `selected_sync` | `int` | yes |  |  |  |
 
@@ -918,7 +918,7 @@ Args:
 | Field | Type | Required | Default | Constraints | Description |
 |-------|------|----------|---------|-------------|-------------|
 | `mode` | `str` | no | `manual` |  |  |
-| `warehouse` | `str` \| None | no | `None` |  |  |
+| `warehouse` | `Union[str, None]` | no | `None` |  |  |
 | `time_limit_mins` | `int` | no | `240` |  |  |
 
 ---
@@ -943,11 +943,11 @@ Args:
 | `mode` | `str` | no | `snowflake_task` |  |  |
 | `sync_frequency` | `str` | yes |  |  |  |
 | `sync_frequency_name` | `str` | yes |  |  |  |
-| `warehouse` | `str` \| None | no | `None` |  |  |
+| `warehouse` | `Union[str, None]` | no | `None` |  |  |
 | `time_limit_mins` | `int` | no | `240` |  |  |
-| `daily_hour` | `int` \| None | no | `None` |  |  |
-| `daily_minute` | `int` \| None | no | `None` |  |  |
-| `minute_of_hour` | `int` \| None | no | `None` |  |  |
+| `daily_hour` | `Union[int, None]` | no | `None` |  |  |
+| `daily_minute` | `Union[int, None]` | no | `None` |  |  |
+| `minute_of_hour` | `Union[int, None]` | no | `None` |  |  |
 
 ---
 
@@ -979,10 +979,10 @@ Record update -> UpdateSyncAction
 | `name` | `str` | yes |  |  |  |
 | `description` | `str` | yes |  |  |  |
 | `icon_source` | `str` | no | `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24"><path fill="currentColor" d="m8 18l-6-6l6-6l1.425 1.425l-4.6 4.6L9.4 16.6Zm8 0l-1.425-1.425l4.6-4.6L14.6 7.4L16 6l6 6Z"/></svg>` |  |  |
-| `action_on_record_create` | `OutboundSyncAction` \| None | no | `None` |  |  |
-| `action_on_record_update` | `OutboundSyncAction` \| None | no | `None` |  |  |
-| `action_on_record_delete` | `OutboundSyncAction` \| None | no | `None` |  |  |
-| `action_on_record_unchanged` | `OutboundSyncAction` \| None | no | `None` |  |  |
+| `action_on_record_create` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
+| `action_on_record_update` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
+| `action_on_record_delete` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
+| `action_on_record_unchanged` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
 | `custom_strategy` | `bool` | no | `True` |  |  |
 
 ---
@@ -1000,10 +1000,10 @@ Record update -> UpdateSyncAction
 | `name` | `str` | yes |  |  |  |
 | `description` | `str` | yes |  |  |  |
 | `icon_source` | `str` | no | `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24"><path fill="currentColor" d="m8 18l-6-6l6-6l1.425 1.425l-4.6 4.6L9.4 16.6Zm8 0l-1.425-1.425l4.6-4.6L14.6 7.4L16 6l6 6Z"/></svg>` |  |  |
-| `action_on_record_create` | `OutboundSyncAction` \| None | no | `None` |  |  |
-| `action_on_record_update` | `OutboundSyncAction` \| None | no | `None` |  |  |
-| `action_on_record_delete` | `OutboundSyncAction` \| None | no | `None` |  |  |
-| `action_on_record_unchanged` | `OutboundSyncAction` \| None | no | `None` |  |  |
+| `action_on_record_create` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
+| `action_on_record_update` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
+| `action_on_record_delete` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
+| `action_on_record_unchanged` | `Union[OutboundSyncAction, None]` | no | `None` |  |  |
 | `custom_strategy` | `bool` | no | `True` |  |  |
 
 ---
@@ -1019,7 +1019,7 @@ Defines a form for configuring a sync. Includes zero or more form fields.
 
 | Field | Type | Required | Default | Constraints | Description |
 |-------|------|----------|---------|-------------|-------------|
-| `fields` | list[`FormInputField` \| `FormTextAreaField` \| `FormSshKeypair` \| `FormX509Certificate` \| `FormGpgKeypair` \| `FormRadioField` \| `FormCheckboxField` \| `FormSliderField` \| `FormDropdownField` \| `InformationField` \| `InformationBoxField` \| `FormSnowflakeStageField`] | yes |  |  |  |
+| `fields` | `list[Union[FormInputField, FormTextAreaField, FormSshKeypair, FormX509Certificate, FormGpgKeypair, FormRadioField, FormCheckboxField, FormSliderField, FormDropdownField, InformationField, InformationBoxField, FormSnowflakeStageField]]` | yes |  |  |  |
 
 ---
 
@@ -1040,9 +1040,9 @@ the rest of the values from the form will be captured and then the connection wi
 | Field | Type | Required | Default | Constraints | Description |
 |-------|------|----------|---------|-------------|-------------|
 | `name` | `str` | yes |  |  |  |
-| `fields` | list[`FormInputField` \| `FormTextAreaField` \| `FormSshKeypair` \| `FormX509Certificate` \| `FormGpgKeypair` \| `FormRadioField` \| `FormCheckboxField` \| `FormSliderField` \| `FormDropdownField` \| `InformationField` \| `InformationBoxField` \| `FormSnowflakeStageField`] | yes |  |  |  |
-| `oauth_template` | `SecurityIntegrationTemplateAuthorizationCode` \| `SecurityIntegrationTemplateClientCredentials` \| None | no | `None` |  |  |
-| `ngrok_tunnel_configuration` | `NGrokMTLSTunnel` \| None | no | `None` |  |  |
+| `fields` | `list[Union[FormInputField, FormTextAreaField, FormSshKeypair, FormX509Certificate, FormGpgKeypair, FormRadioField, FormCheckboxField, FormSliderField, FormDropdownField, InformationField, InformationBoxField, FormSnowflakeStageField]]` | yes |  |  |  |
+| `oauth_template` | `Union[Union[SecurityIntegrationTemplateAuthorizationCode, SecurityIntegrationTemplateClientCredentials], None]` | no | `None` |  |  |
+| `ngrok_tunnel_configuration` | `Union[NGrokMTLSTunnel, None]` | no | `None` |  |  |
 | `description` | `str` | no | `` |  |  |
 
 ---
@@ -1056,7 +1056,7 @@ A Data Source for providing a set of form options that load dynamically from the
 | Field | Type | Required | Default | Constraints | Description |
 |-------|------|----------|---------|-------------|-------------|
 | `source_function` | `str` | yes |  |  |  |
-| `new_option_creator` | `NewOptionCreator` \| None | no | `None` |  |  |
+| `new_option_creator` | `Union[NewOptionCreator, None]` | no | `None` |  |  |
 | `type` | `str` | no | `dynamic` |  |  |
 
 ---
@@ -1074,7 +1074,7 @@ A field which presents a checkbox
 | `default_value` | `bool` | no | `False` |  |  |
 | `required` | `bool` | no | `False` |  |  |
 | `secret` | `bool` | no | `False` |  |  |
-| `depends_on` | `str` \| None | no | `None` |  |  |
+| `depends_on` | `Union[str, None]` | no | `None` |  |  |
 | `help_text` | `str` | no | `` |  |  |
 | `reload_on_change` | `bool` | no | `False` |  |  |
 | `type` | `str` | no | `checkbox` |  |  |
@@ -1089,13 +1089,13 @@ A field which presents a dropdown list of options
 
 | Field | Type | Required | Default | Constraints | Description |
 |-------|------|----------|---------|-------------|-------------|
-| `data_source` | `StaticFormOptionsDataSource` \| `DynamicFormOptionsDataSource` | yes |  |  |  |
+| `data_source` | `Union[StaticFormOptionsDataSource, DynamicFormOptionsDataSource]` | yes |  |  |  |
 | `name` | `str` | yes |  |  |  |
 | `label` | `str` | yes |  |  |  |
-| `default_value` | `str` \| None | no | `None` |  |  |
+| `default_value` | `Union[str, None]` | no | `None` |  |  |
 | `required` | `bool` | no | `False` |  |  |
 | `secret` | `bool` | no | `False` |  |  |
-| `depends_on` | `str` \| None | no | `None` |  |  |
+| `depends_on` | `Union[str, None]` | no | `None` |  |  |
 | `help_text` | `str` | no | `` |  |  |
 | `reload_on_change` | `bool` | no | `False` |  |  |
 | `type` | `str` | no | `dropdown` |  |  |
@@ -1115,10 +1115,10 @@ Uses a visual column->field mapper, to allow the user to define how source colum
 
 | Field | Type | Required | Default | Constraints | Description |
 |-------|------|----------|---------|-------------|-------------|
-| `data_source` | `StaticFormOptionsDataSource` \| `DynamicFormOptionsDataSource` | yes |  |  |  |
+| `data_source` | `Union[StaticFormOptionsDataSource, DynamicFormOptionsDataSource]` | yes |  |  |  |
 | `mapper_type` | `str` | no | `field_mapping_selector` |  |  |
 | `label` | `str` | no | `Field Mappings` |  |  |
-| `depends_on` | `str` \| None | no | `None` |  |  |
+| `depends_on` | `Union[str, None]` | no | `None` |  |  |
 
 ---
 
@@ -1130,7 +1130,7 @@ Denotes that the field uses a data source
 
 | Field | Type | Required | Default | Constraints | Description |
 |-------|------|----------|---------|-------------|-------------|
-| `data_source` | `StaticFormOptionsDataSource` \| `DynamicFormOptionsDataSource` | yes |  |  |  |
+| `data_source` | `Union[StaticFormOptionsDataSource, DynamicFormOptionsDataSource]` | yes |  |  |  |
 
 ---
 
@@ -1144,9 +1144,9 @@ An GPG Keypair field, which generates public and private GPG keys for asymmetric
 |-------|------|----------|---------|-------------|-------------|
 | `name` | `str` | yes |  |  |  |
 | `label` | `str` | yes |  |  |  |
-| `default_value` | `str` \| None | no | `None` |  |  |
+| `default_value` | `Union[str, None]` | no | `None` |  |  |
 | `required` | `bool` | no | `False` |  |  |
-| `depends_on` | `str` \| None | no | `None` |  |  |
+| `depends_on` | `Union[str, None]` | no | `None` |  |  |
 | `help_text` | `str` | no | `` |  |  |
 | `local_side` | `str` | no | `public` |  |  |
 | `allow_user_provided` | `bool` | no | `True` |  |  |
@@ -1165,9 +1165,9 @@ An input field, which collects a single line of free-form text from the user and
 |-------|------|----------|---------|-------------|-------------|
 | `name` | `str` | yes |  |  |  |
 | `label` | `str` | yes |  |  |  |
-| `default_value` | `str` \| `bool` | no | `` |  |  |
+| `default_value` | `Union[str, bool]` | no | `` |  |  |
 | `required` | `bool` | no | `False` |  |  |
-| `depends_on` | `str` \| None | no | `None` |  |  |
+| `depends_on` | `Union[str, None]` | no | `None` |  |  |
 | `help_text` | `str` | no | `` |  |  |
 | `reload_on_change` | `bool` | no | `False` |  |  |
 | `secret` | `bool` | no | `False` |  |  |
@@ -1185,7 +1185,7 @@ Uses text area to allow the user to create a template, which can include column 
 |-------|------|----------|---------|-------------|-------------|
 | `mapper_type` | `str` | no | `jinja_template` |  |  |
 | `label` | `str` | no | `Jinja Template` |  |  |
-| `depends_on` | `str` \| None | no | `None` |  |  |
+| `depends_on` | `Union[str, None]` | no | `None` |  |  |
 
 ---
 
@@ -1235,13 +1235,13 @@ A field which presents a set of radio options
 
 | Field | Type | Required | Default | Constraints | Description |
 |-------|------|----------|---------|-------------|-------------|
-| `data_source` | `StaticFormOptionsDataSource` \| `DynamicFormOptionsDataSource` | yes |  |  |  |
+| `data_source` | `Union[StaticFormOptionsDataSource, DynamicFormOptionsDataSource]` | yes |  |  |  |
 | `name` | `str` | yes |  |  |  |
 | `label` | `str` | yes |  |  |  |
-| `default_value` | `str` \| None | no | `None` |  |  |
+| `default_value` | `Union[str, None]` | no | `None` |  |  |
 | `required` | `bool` | no | `False` |  |  |
 | `secret` | `bool` | no | `False` |  |  |
-| `depends_on` | `str` \| None | no | `None` |  |  |
+| `depends_on` | `Union[str, None]` | no | `None` |  |  |
 | `help_text` | `str` | no | `` |  |  |
 | `reload_on_change` | `bool` | no | `False` |  |  |
 | `type` | `str` | no | `radio` |  |  |
@@ -1258,10 +1258,10 @@ A field which presents a slider
 |-------|------|----------|---------|-------------|-------------|
 | `name` | `str` | yes |  |  |  |
 | `label` | `str` | yes |  |  |  |
-| `default_value` | `str` \| `int` \| None | no | `None` |  |  |
+| `default_value` | `Union[str, int, None]` | no | `None` |  |  |
 | `secret` | `bool` | no | `False` |  |  |
 | `required` | `bool` | no | `False` |  |  |
-| `depends_on` | `str` \| None | no | `None` |  |  |
+| `depends_on` | `Union[str, None]` | no | `None` |  |  |
 | `help_text` | `str` | no | `` |  |  |
 | `reload_on_change` | `bool` | no | `False` |  |  |
 | `type` | `str` | no | `slider` |  |  |
@@ -1281,9 +1281,9 @@ A field which represents a stage which can be selected from a list shared to the
 |-------|------|----------|---------|-------------|-------------|
 | `name` | `str` | yes |  |  |  |
 | `label` | `str` | yes |  |  |  |
-| `default_value` | `str` \| `bool` | no | `` |  |  |
+| `default_value` | `Union[str, bool]` | no | `` |  |  |
 | `required` | `bool` | no | `False` |  |  |
-| `depends_on` | `str` \| None | no | `None` |  |  |
+| `depends_on` | `Union[str, None]` | no | `None` |  |  |
 | `help_text` | `str` | no | `` |  |  |
 | `reload_on_change` | `bool` | no | `False` |  |  |
 | `secret` | `bool` | no | `False` |  |  |
@@ -1301,9 +1301,9 @@ An SSH Keypair field, which generates public and private keys for asymmetric cry
 |-------|------|----------|---------|-------------|-------------|
 | `name` | `str` | yes |  |  |  |
 | `label` | `str` | yes |  |  |  |
-| `default_value` | `str` \| None | no | `None` |  |  |
+| `default_value` | `Union[str, None]` | no | `None` |  |  |
 | `required` | `bool` | no | `False` |  |  |
-| `depends_on` | `str` \| None | no | `None` |  |  |
+| `depends_on` | `Union[str, None]` | no | `None` |  |  |
 | `help_text` | `str` | no | `` |  |  |
 | `local_side` | `str` | no | `public` |  |  |
 | `allow_user_provided` | `bool` | no | `True` |  |  |
@@ -1335,7 +1335,7 @@ A text area field, which collects multi-line free-form text from the user and no
 | `default_value` | `str` | no | `` |  |  |
 | `secret` | `bool` | no | `False` |  |  |
 | `required` | `bool` | no | `False` |  |  |
-| `depends_on` | `str` \| None | no | `None` |  |  |
+| `depends_on` | `Union[str, None]` | no | `None` |  |  |
 | `help_text` | `str` | no | `` |  |  |
 | `reload_on_change` | `bool` | no | `False` |  |  |
 | `type` | `str` | no | `textarea` |  |  |
@@ -1354,9 +1354,9 @@ Like a textarea field, except it decodes and shows information about the certifi
 |-------|------|----------|---------|-------------|-------------|
 | `name` | `str` | yes |  |  |  |
 | `label` | `str` | yes |  |  |  |
-| `default_value` | `str` \| None | no | `None` |  |  |
+| `default_value` | `Union[str, None]` | no | `None` |  |  |
 | `required` | `bool` | no | `False` |  |  |
-| `depends_on` | `str` \| None | no | `None` |  |  |
+| `depends_on` | `Union[str, None]` | no | `None` |  |  |
 | `help_text` | `str` | no | `` |  |  |
 | `type` | `str` | no | `x509_certificate` |  |  |
 | `secret` | `bool` | no | `True` |  |  |
@@ -1372,7 +1372,7 @@ The form values provided via these fields are passed into the inbound_list_strea
 
 | Field | Type | Required | Default | Constraints | Description |
 |-------|------|----------|---------|-------------|-------------|
-| `fields` | list[`FormInputField` \| `FormTextAreaField` \| `FormSshKeypair` \| `FormX509Certificate` \| `FormGpgKeypair` \| `FormRadioField` \| `FormCheckboxField` \| `FormSliderField` \| `FormDropdownField` \| `InformationField` \| `InformationBoxField` \| `FormSnowflakeStageField`] | no |  |  |  |
+| `fields` | `list[Union[FormInputField, FormTextAreaField, FormSshKeypair, FormX509Certificate, FormGpgKeypair, FormRadioField, FormCheckboxField, FormSliderField, FormDropdownField, InformationField, InformationBoxField, FormSnowflakeStageField]]` | no |  |  |  |
 
 ---
 
@@ -1393,11 +1393,11 @@ This variant renders it inside a box, with an icon and a different background co
 |-------|------|----------|---------|-------------|-------------|
 | `name` | `str` | yes |  |  |  |
 | `markdown_content` | `str` | yes |  |  |  |
-| `depends_on` | `str` \| None | no | `None` |  |  |
+| `depends_on` | `Union[str, None]` | no | `None` |  |  |
 | `type` | `str` | no | `information_box` |  |  |
 | `reload_on_change` | `bool` | no | `False` |  |  |
 | `box_type` | `str` | no | `info` |  |  |
-| `box_icon` | `str` \| None | no | `None` |  |  |
+| `box_icon` | `Union[str, None]` | no | `None` |  |  |
 | `secret` | `bool` | no | `False` |  |  |
 
 ---
@@ -1416,7 +1416,7 @@ A field which allows information to be displayed to the user in plain markdown, 
 |-------|------|----------|---------|-------------|-------------|
 | `name` | `str` | yes |  |  |  |
 | `markdown_content` | `str` | yes |  |  |  |
-| `depends_on` | `str` \| None | no | `None` |  |  |
+| `depends_on` | `Union[str, None]` | no | `None` |  |  |
 | `type` | `str` | no | `information` |  |  |
 | `reload_on_change` | `bool` | no | `False` |  |  |
 | `secret` | `bool` | no | `False` |  |  |
@@ -1465,8 +1465,8 @@ to map Snowflake columns to app fields/payloads.
 
 | Field | Type | Required | Default | Constraints | Description |
 |-------|------|----------|---------|-------------|-------------|
-| `fields` | list[`FormInputField` \| `FormTextAreaField` \| `FormSshKeypair` \| `FormX509Certificate` \| `FormGpgKeypair` \| `FormRadioField` \| `FormCheckboxField` \| `FormSliderField` \| `FormDropdownField` \| `InformationField` \| `InformationBoxField` \| `FormSnowflakeStageField`] | yes |  |  |  |
-| `mapper` | `FormFieldMappingSelector` \| `FormJinjaTemplate` \| None | no | `None` |  |  |
+| `fields` | `list[Union[FormInputField, FormTextAreaField, FormSshKeypair, FormX509Certificate, FormGpgKeypair, FormRadioField, FormCheckboxField, FormSliderField, FormDropdownField, InformationField, InformationBoxField, FormSnowflakeStageField]]` | yes |  |  |  |
+| `mapper` | `Union[Union[FormFieldMappingSelector, FormJinjaTemplate], None]` | no | `None` |  |  |
 
 ---
 
@@ -1479,13 +1479,13 @@ in turn allows the customer to create an OAuth based secret object
 
 | Field | Type | Required | Default | Constraints | Description |
 |-------|------|----------|---------|-------------|-------------|
-| `oauth_docs_url` | `str` \| None | no | `None` |  |  |
+| `oauth_docs_url` | `Union[str, None]` | no | `None` |  |  |
 | `oauth_grant` | `str` | no | `authorization_code` |  |  |
 | `oauth_client_id` | `str` | no | `<client id>` |  |  |
 | `oauth_client_secret` | `str` | no | `<client secret>` |  |  |
 | `oauth_token_endpoint` | `str` | no | `<token endpoint>` |  |  |
 | `oauth_authorization_endpoint` | `str` | no | `<authorization endpoint>` |  |  |
-| `oauth_allowed_scopes` | list[`str`] | no | `[]` |  |  |
+| `oauth_allowed_scopes` | `list[str]` | no | `[]` |  |  |
 
 ---
 
@@ -1498,12 +1498,12 @@ in turn allows the customer to create an OAuth based secret object
 
 | Field | Type | Required | Default | Constraints | Description |
 |-------|------|----------|---------|-------------|-------------|
-| `oauth_docs_url` | `str` \| None | no | `None` |  |  |
+| `oauth_docs_url` | `Union[str, None]` | no | `None` |  |  |
 | `oauth_grant` | `str` | no | `client_credentials` |  |  |
 | `oauth_client_id` | `str` | no | `<client id>` |  |  |
 | `oauth_client_secret` | `str` | no | `<client secret>` |  |  |
 | `oauth_token_endpoint` | `str` | no | `<token endpoint>` |  |  |
-| `oauth_allowed_scopes` | list[`str`] | no | `[]` |  |  |
+| `oauth_allowed_scopes` | `list[str]` | no | `[]` |  |  |
 
 ---
 
@@ -1519,8 +1519,8 @@ A Data Source for providing a static set of form options
 
 | Field | Type | Required | Default | Constraints | Description |
 |-------|------|----------|---------|-------------|-------------|
-| `values` | list[`FormOption`] | no |  |  |  |
-| `new_option_creator` | `NewOptionCreator` \| None | no | `None` |  |  |
+| `values` | `list[FormOption]` | no |  |  |  |
+| `new_option_creator` | `Union[NewOptionCreator, None]` | no | `None` |  |  |
 | `type` | `str` | no | `static` |  |  |
 
 ---
@@ -1534,7 +1534,7 @@ This is not a template, it's a fully specified object.
 
 | Field | Type | Required | Default | Constraints | Description |
 |-------|------|----------|---------|-------------|-------------|
-| `database_name` | `str` \| None | no | `None` |  | The database name |
+| `database_name` | `Union[str, None]` | no | `None` |  | The database name |
 | `schema_name` | `str` | yes |  |  | The schema name |
 | `table_name` | `str` | yes |  |  | The table name |
 
@@ -1549,20 +1549,20 @@ Used mainly to do partial parsing as we extract fields from within the schema
 
 | Field | Type | Required | Default | Constraints | Description |
 |-------|------|----------|---------|-------------|-------------|
-| `type` | `str` \| list[`str`] \| None | yes |  |  | The type of the property |
-| `$ref` | `str` \| None | no | `None` |  | The reference to another schema |
+| `type` | `Union[str, list[str], None]` | yes |  |  | The type of the property |
+| `$ref` | `Union[str, None]` | no | `None` |  | The reference to another schema |
 | `nullable` | `bool` | no | `True` |  | Whether the property is nullable |
-| `description` | `str` \| None | no | `None` |  | The description of the property |
-| `format` | `str` \| None | no | `None` |  | The format of the property, e.g. date-time |
-| `properties` | `dict` \| None | no | `None` |  | The sub-properties of the property, if the property is an object type |
-| `snowflakeTimestampType` | `str` \| None | no | `None` |  | The Snowflake timestamp type to use when interpreting a date-time string. |
-| `snowflakeTimestampFormat` | `str` \| None | no | `None` |  | The Snowflake timestamp format to use when interpreting a date-time string. |
-| `snowflakePrecision` | `int` \| None | no | `None` |  | The Snowflake precision to assign to the column. |
-| `snowflakeScale` | `int` \| None | no | `None` |  | The Snowflake scale to assign to the column. |
-| `snowflakeColumnExpression` | `str` \| None | no | `None` |  | When advanced processing is needed, you can provide a value here. Use {{variant_path}} to interpolate the path to the JSON field. |
-| `isJoinColumn` | `bool` \| None | no | `False` |  | Whether this column is sourced from a joined stream |
-| `requiredStreamNames` | list[`str`] \| None | no | `None` |  | The names of the streams that are depended upon by this column, via joins. If these streams are not selected, the column will be omitted. |
-| `referencedFields` | `dict` \| None | no | `None` |  | The names of fields that are referenced by this field, keyed on the stream name (or None if it's the current stream). This is used to order the fields, and also to cascade the removal of unsupported fields (e.g. in formulas). |
+| `description` | `Union[str, None]` | no | `None` |  | The description of the property |
+| `format` | `Union[str, None]` | no | `None` |  | The format of the property, e.g. date-time |
+| `properties` | `Union[dict, None]` | no | `None` |  | The sub-properties of the property, if the property is an object type |
+| `snowflakeTimestampType` | `Union[str, None]` | no | `None` |  | The Snowflake timestamp type to use when interpreting a date-time string. |
+| `snowflakeTimestampFormat` | `Union[str, None]` | no | `None` |  | The Snowflake timestamp format to use when interpreting a date-time string. |
+| `snowflakePrecision` | `Union[int, None]` | no | `None` |  | The Snowflake precision to assign to the column. |
+| `snowflakeScale` | `Union[int, None]` | no | `None` |  | The Snowflake scale to assign to the column. |
+| `snowflakeColumnExpression` | `Union[str, None]` | no | `None` |  | When advanced processing is needed, you can provide a value here. Use {{variant_path}} to interpolate the path to the JSON field. |
+| `isJoinColumn` | `Union[bool, None]` | no | `False` |  | Whether this column is sourced from a joined stream |
+| `requiredStreamNames` | `Union[list[str], None]` | no | `None` |  | The names of the streams that are depended upon by this column, via joins. If these streams are not selected, the column will be omitted. |
+| `referencedFields` | `Union[dict, None]` | no | `None` |  | The names of fields that are referenced by this field, keyed on the stream name (or None if it's the current stream). This is used to order the fields, and also to cascade the removal of unsupported fields (e.g. in formulas). |
 
 ---
 
@@ -1576,9 +1576,9 @@ Instead, it takes the basic properties and then allows for further parsing on de
 
 | Field | Type | Required | Default | Constraints | Description |
 |-------|------|----------|---------|-------------|-------------|
-| `description` | `str` \| None | no | `None` |  | The description of the schema |
-| `joins` | list[`SnowflakeViewJoin`] \| None | no | `None` |  | The joins to include in the view |
-| `properties` | `dict` \| None | no | `None` |  | The properties of the schema. This is left as a dictionary, and parsed on demand. |
+| `description` | `Union[str, None]` | no | `None` |  | The description of the schema |
+| `joins` | `Union[list[SnowflakeViewJoin], None]` | no | `None` |  | The joins to include in the view |
+| `properties` | `Union[dict, None]` | no | `None` |  | The properties of the schema. This is left as a dictionary, and parsed on demand. |
 
 ---
 
@@ -1595,10 +1595,10 @@ In other words, the column definition is "expression as name".
 | `name` | `str` | yes |  |  |  |
 | `original_name` | `str` | yes |  |  | The name of the column before the column naming transformation is applied |
 | `expression` | `str` | yes |  |  |  |
-| `comment` | `str` \| None | no | `None` |  |  |
-| `is_join_column` | `bool` \| None | no | `False` |  | Whether this column is sourced from a joined stream |
-| `required_stream_names` | list[`str`] \| None | no | `None` |  | The names of the streams that are depended upon by this column, via joins. If these streams are not selected, the column will be omitted |
-| `referenced_columns` | `dict` \| None | no | `None` |  | The names of columns that are referenced by this column, keyed on the stream name (or None if it's the current stream). This is used to order the columns, and also to cascade the removal of unsupported columns (e.g. in formulas). |
+| `comment` | `Union[str, None]` | no | `None` |  |  |
+| `is_join_column` | `Union[bool, None]` | no | `False` |  | Whether this column is sourced from a joined stream |
+| `required_stream_names` | `Union[list[str], None]` | no | `None` |  | The names of the streams that are depended upon by this column, via joins. If these streams are not selected, the column will be omitted |
+| `referenced_columns` | `Union[dict, None]` | no | `None` |  | The names of columns that are referenced by this column, keyed on the stream name (or None if it's the current stream). This is used to order the columns, and also to cascade the removal of unsupported columns (e.g. in formulas). |
 
 ---
 
@@ -1629,9 +1629,9 @@ Because a normalized view can be built from multiple streams, this is potentiall
 |-------|------|----------|---------|-------------|-------------|
 | `stream_name` | `str` | yes |  |  | The name of the stream |
 | `raw_table_location` | `FullyQualifiedTable` | yes |  |  | The location of the raw table that the stream is sourced from |
-| `comment` | `str` \| None | no | `None` |  | The comment to assign to the view |
-| `columns` | list[`SnowflakeViewColumn`] | yes |  |  | The columns to include in the view |
-| `joins` | list[`SnowflakeViewJoin`] | yes |  |  | The joins to include in the view |
+| `comment` | `Union[str, None]` | no | `None` |  | The comment to assign to the view |
+| `columns` | `list[SnowflakeViewColumn]` | yes |  |  | The columns to include in the view |
+| `joins` | `list[SnowflakeViewJoin]` | yes |  |  | The joins to include in the view |
 
 ---
 
@@ -1645,7 +1645,7 @@ This is the top level object that represents the whole view.
 | Field | Type | Required | Default | Constraints | Description |
 |-------|------|----------|---------|-------------|-------------|
 | `main_part` | `SnowflakeViewPart` | yes |  |  | The main part of the view, which is the stream that the view is named after |
-| `joined_parts` | list[`SnowflakeViewPart`] | yes |  |  | The other streams that are joined to the main stream |
+| `joined_parts` | `list[SnowflakeViewPart]` | yes |  |  | The other streams that are joined to the main stream |
 
 ---
 
@@ -1662,7 +1662,7 @@ have been known until the connection was made.
 |-------|------|----------|---------|-------------|-------------|
 | `connection_parameters` | `dict` | no | `{}` |  |  |
 | `connection_secrets` | `dict` | no | `{}` |  |  |
-| `network_addresses` | list[`str`] \| `NetworkAddresses` | no | `[]` |  |  |
+| `network_addresses` | `Union[list[str], NetworkAddresses]` | no | `[]` |  |  |
 
 ---
 
@@ -1730,17 +1730,17 @@ Manifest plus other derived information about a plugin which is determined durin
 | Field | Type | Required | Default | Constraints | Description |
 |-------|------|----------|---------|-------------|-------------|
 | `manifest` | `PluginManifest` | yes |  |  |  |
-| `anaconda_packages` | list[`str`] | yes |  |  |  |
-| `bundled_packages` | list[`str`] | yes |  |  |  |
-| `icon_source` | `str` \| None | no | `None` |  |  |
+| `anaconda_packages` | `list[str]` | yes |  |  |  |
+| `bundled_packages` | `list[str]` | yes |  |  |  |
+| `icon_source` | `Union[str, None]` | no | `None` |  |  |
 | `plugin_class_name` | `str` | yes |  |  |  |
 | `has_custom_validator` | `bool` | yes |  |  |  |
 | `plugin_runtime_version` | `str` | yes |  |  |  |
 | `plugin_devkit_version` | `str` | no | `unknown` |  |  |
 | `tier` | `str` | yes |  |  |  |
 | `package_source` | `str` | yes |  |  |  |
-| `consumer_udfs` | list[`UDFDefinition`] | no |  |  |  |
-| `consumer_udtfs` | list[`UDTFDefinition`] | no |  |  |  |
+| `consumer_udfs` | `list[UDFDefinition]` | no |  |  |  |
+| `consumer_udtfs` | `list[UDTFDefinition]` | no |  |  |  |
 
 ---
 
@@ -1772,9 +1772,9 @@ Constructs a Plugin Manifest, which identifies the application, describes how it
 | `developer_name` | `str` | yes |  |  |  |
 | `docs_url` | `str` | yes |  |  |  |
 | `supports_inbound` | `bool` | yes |  |  |  |
-| `supported_outbound_strategies` | list[`OutboundSyncStrategy`] | yes |  |  |  |
-| `supported_connectivity_options` | list[`ConnectivityOption`] | no |  |  |  |
-| `outbound_target_types` | list[`OutboundTargetType`] \| None | no | `None` |  |  |
+| `supported_outbound_strategies` | `list[OutboundSyncStrategy]` | yes |  |  |  |
+| `supported_connectivity_options` | `list[ConnectivityOption]` | no |  |  |  |
+| `outbound_target_types` | `Union[list[OutboundTargetType], None]` | no | `None` |  |  |
 | `outbound_target_transformation_parameters` | `OutboundRecordTransformationParameters` | no |  |  |  |
 
 ---
@@ -1789,11 +1789,11 @@ See https://docs.snowflake.com/en/sql-reference/functions/system_create_billing_
 | Field | Type | Required | Default | Constraints | Description |
 |-------|------|----------|---------|-------------|-------------|
 | `billing_class` | `str` | yes |  |  |  |
-| `base_charge` | `float` \| `str` | yes |  |  |  |
-| `timestamp` | `str` | no | `2026-04-22T06:57:32.102612Z` |  |  |
-| `sub_class` | `str` \| None | no | `None` |  |  |
-| `start_timestamp` | `str` \| None | no | `None` |  |  |
-| `objects` | list[`str`] | no | `[]` |  |  |
+| `base_charge` | `Union[float, str]` | yes |  |  |  |
+| `timestamp` | `str` | no | `2026-04-22T07:04:46.956788Z` |  |  |
+| `sub_class` | `Union[str, None]` | no | `None` |  |  |
+| `start_timestamp` | `Union[str, None]` | no | `None` |  |  |
+| `objects` | `list[str]` | no | `[]` |  |  |
 | `additional_info` | `dict` | no | `{}` |  |  |
 
 ---
@@ -1809,7 +1809,7 @@ Represents a parameter for a Snowflake UDF or UDTF
 | `name` | `str` | yes |  |  |  |
 | `description` | `str` | yes |  |  |  |
 | `data_type` | `str` | yes |  |  |  |
-| `default_value_clause` | `str` \| None | no | `None` |  |  |
+| `default_value_clause` | `Union[str, None]` | no | `None` |  |  |
 
 ---
 
@@ -1839,12 +1839,12 @@ Do not use this class directly in plugins, instead use the omnata_udf decorator.
 | `language` | `str` | yes |  |  |  |
 | `runtime_version` | `str` | yes |  |  |  |
 | `description` | `str` | yes |  |  |  |
-| `params` | list[`SnowflakeFunctionParameter`] | yes |  |  |  |
+| `params` | `list[SnowflakeFunctionParameter]` | yes |  |  |  |
 | `result_data_type` | `str` | yes |  |  |  |
 | `handler` | `str` | yes |  |  |  |
 | `expose_to_consumer` | `bool` | yes |  |  |  |
-| `imports` | list[`str`] \| None | no | `None` |  |  |
-| `packages` | list[`str`] \| None | no | `None` |  |  |
+| `imports` | `Union[list[str], None]` | no | `None` |  |  |
+| `packages` | `Union[list[str], None]` | no | `None` |  |  |
 
 ---
 
@@ -1861,12 +1861,12 @@ Do not use this class directly in plugins, instead use the omnata_udtf decorator
 | `language` | `str` | yes |  |  |  |
 | `runtime_version` | `str` | yes |  |  |  |
 | `description` | `str` | yes |  |  |  |
-| `params` | list[`SnowflakeFunctionParameter`] | yes |  |  |  |
-| `result_columns` | list[`SnowflakeUDTFResultColumn`] | yes |  |  |  |
+| `params` | `list[SnowflakeFunctionParameter]` | yes |  |  |  |
+| `result_columns` | `list[SnowflakeUDTFResultColumn]` | yes |  |  |  |
 | `handler` | `str` | yes |  |  |  |
 | `expose_to_consumer` | `bool` | yes |  |  |  |
-| `imports` | list[`str`] \| None | no | `None` |  |  |
-| `packages` | list[`str`] \| None | no | `None` |  |  |
+| `imports` | `Union[list[str], None]` | no | `None` |  |  |
+| `packages` | `Union[list[str], None]` | no | `None` |  |  |
 
 ---
 
@@ -1879,8 +1879,8 @@ Encapsulates the constraints imposed by an app's APIs
 | Field | Type | Required | Default | Constraints | Description |
 |-------|------|----------|---------|-------------|-------------|
 | `endpoint_category` | `str` | no | `All endpoints` |  | the name of the API category (e.g. "Data loading endpoints") |
-| `request_matchers` | list[`HttpRequestMatcher`] | no | `[{'http_methods': ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH'], 'url_regex': '.*'}]` |  | a list of request matchers. If None is provided, all requests will be matched |
-| `request_rates` | list[`RequestRateLimit`] | no | `None` |  | imposes time delays between requests to stay under a defined rate limit |
+| `request_matchers` | `list[HttpRequestMatcher]` | no | `[{'http_methods': ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH'], 'url_regex': '.*'}]` |  | a list of request matchers. If None is provided, all requests will be matched |
+| `request_rates` | `list[RequestRateLimit]` | no | `None` |  | imposes time delays between requests to stay under a defined rate limit |
 
 ---
 
@@ -1892,7 +1892,7 @@ A class used to match an HTTP request
 
 | Field | Type | Required | Default | Constraints | Description |
 |-------|------|----------|---------|-------------|-------------|
-| `http_methods` | list[`str`] | yes |  |  |  |
+| `http_methods` | `list[str]` | yes |  |  |  |
 | `url_regex` | `str` | yes |  |  |  |
 
 ---
@@ -1907,8 +1907,8 @@ Accuracy is critical for these calculations, so we raise errors early to ensure 
 
 | Field | Type | Required | Default | Constraints | Description |
 |-------|------|----------|---------|-------------|-------------|
-| `wait_until` | `str` \| None | no | `None` |  | Providing a value here means that no requests should occur until a specific moment in the future |
-| `previous_request_timestamps` | list[`str`] \| None | no | `[]` |  | A list of timestamps where previous requests have been made, used to calculate the next request time |
+| `wait_until` | `Union[str, None]` | no | `None` |  | Providing a value here means that no requests should occur until a specific moment in the future |
+| `previous_request_timestamps` | `Union[list[str], None]` | no | `[]` |  | A list of timestamps where previous requests have been made, used to calculate the next request time |
 
 ---
 

@@ -23,12 +23,11 @@ except ImportError:
     sys.exit(1)
 
 
-def get_type_string(field_schema: dict, all_defs: dict) -> str:
-    """Resolve a field schema to a readable type string."""
+def _type_str(field_schema: dict, all_defs: dict) -> str:
+    """Resolve a field schema to a raw type string (no backticks)."""
     # Handle $ref
     if "$ref" in field_schema:
-        ref = field_schema["$ref"].split("/")[-1]
-        return f"`{ref}`"
+        return field_schema["$ref"].split("/")[-1]
 
     # Handle anyOf / oneOf (e.g. Optional[X] becomes anyOf: [X, null])
     for key in ("anyOf", "oneOf"):
@@ -39,19 +38,22 @@ def get_type_string(field_schema: dict, all_defs: dict) -> str:
                 if sub.get("type") == "null":
                     has_null = True
                 else:
-                    parts.append(get_type_string(sub, all_defs))
-            type_str = " | ".join(parts) if parts else "any"
-            return f"{type_str} | None" if has_null else type_str
+                    parts.append(_type_str(sub, all_defs))
+            if has_null:
+                parts.append("None")
+            if len(parts) == 1:
+                return parts[0]
+            return f"Union[{', '.join(parts)}]"
 
     # Handle allOf (usually a single $ref wrapped)
     if "allOf" in field_schema:
-        parts = [get_type_string(s, all_defs) for s in field_schema["allOf"]]
-        return " & ".join(parts)
+        parts = [_type_str(s, all_defs) for s in field_schema["allOf"]]
+        return f"Union[{', '.join(parts)}]" if len(parts) > 1 else parts[0]
 
     # Handle arrays
     if field_schema.get("type") == "array":
         items = field_schema.get("items", {})
-        return f"list[{get_type_string(items, all_defs)}]"
+        return f"list[{_type_str(items, all_defs)}]"
 
     # Handle basic types
     type_map = {
@@ -64,13 +66,18 @@ def get_type_string(field_schema: dict, all_defs: dict) -> str:
     }
     t = field_schema.get("type")
     if t:
-        return f"`{type_map.get(t, t)}`"
+        return type_map.get(t, t)
 
-    # Handle enums
+    # Handle enums (inline literal values, comma-separated to avoid pipes)
     if "enum" in field_schema:
-        return " | ".join(f"`{v}`" for v in field_schema["enum"])
+        return ", ".join(f"'{v}'" for v in field_schema["enum"])
 
-    return "`any`"
+    return "any"
+
+
+def get_type_string(field_schema: dict, all_defs: dict) -> str:
+    """Resolve a field schema to a backtick-wrapped type string for markdown."""
+    return f"`{_type_str(field_schema, all_defs)}`"
 
 
 def get_constraints(field_schema: dict) -> str:
@@ -105,15 +112,14 @@ def enum_to_markdown(enum_cls: type) -> str:
     lines.append(f"**Module:** `{module_path}`")
     lines.append("")
 
-    description = inspect.getdoc(enum_cls)
-    if description:
-        lines.append(description)
+    class_doc = inspect.getdoc(enum_cls) or ""
+    if class_doc:
+        lines.append(class_doc)
         lines.append("")
 
-    class_doc = inspect.getdoc(enum_cls) or ""
     lines.append("| Member | Value | Description |")
     lines.append("|--------|-------|-------------|")
-    for member in enum_cls: # type: ignore
+    for member in enum_cls:
         member_doc = inspect.getdoc(member) or ""
         if member_doc == class_doc:
             member_doc = ""
@@ -121,7 +127,6 @@ def enum_to_markdown(enum_cls: type) -> str:
 
     lines.append("")
     return "\n".join(lines)
-
 
 
 def model_to_markdown(model: type, all_defs: dict) -> str:
@@ -159,7 +164,6 @@ def model_to_markdown(model: type, all_defs: dict) -> str:
                 default = f"`{field_info['default']}`"
 
             constraints = get_constraints(field_info)
-
             description = field_info.get("description", "").replace("|", "\\|")
 
             lines.append(
