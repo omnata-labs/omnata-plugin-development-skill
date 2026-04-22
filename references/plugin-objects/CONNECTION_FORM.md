@@ -26,6 +26,12 @@ The following function parameters will be expected:
 
 The function will return a list of ConnectionMethod objects which offer the user various ways to authenticate, along with the associated form options. See `../data-structures.md` for the structure of these objects.
 
+## Testing
+The correct behaviour of the stored proc can be verified by taking the 'data' result field value and performing a Pydantic validation:
+```
+TypeAdapter(List[ConnectionMethod]).validate_python(result['data'])
+```
+
 ## Procedure body examples
 
 ### OAuth over internet, API key over privatelink
