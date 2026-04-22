@@ -17,7 +17,7 @@ Use this skill when the user wants to:
 
 ## Prerequisites
 
-- Active Snowflake connection with access to `OMNATA_SYNC_ENGINE` application
+- Active Snowflake connection with access to `OMNATA_SYNC_ENGINE` application. The user may advise that the application is installed under a different name, but this is the default.
 - The `OMNATA_PLUGIN_DEVELOPMENT` database must exist for locally developed plugins
 
 ## Setup
@@ -57,6 +57,8 @@ Use this skill when the user wants to:
 **Output:** Selected PLUGIN_FQN, plugin name, docs_url, and list of existing procedures.
 
 **⚠️ STOP**: Confirm which plugin and which procedure to work on before proceeding.
+
+Note: You do not need to call the `REGISTER_PLUGIN` procedure, that is for external plugins developed outside of the local environment.
 
 ### Step 2: Gather Requirements
 
