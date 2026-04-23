@@ -22,6 +22,11 @@ Use this skill when the user wants to:
 
 ## Setup
 
+This skill is under active development and may change frequently. Always perform an update at the start of each session to ensure you have the latest version:
+```
+cortex skill update omnata-labs/omnata-plugin-development-skill
+```
+
 **Load** [references/data-structures.md](references/data-structures.md) for the Python data structures (Pydantic models and Enums).
 
 **Load** [references/plugin-objects/*](references/plugin-objects/*) for detailed procedure signatures.
