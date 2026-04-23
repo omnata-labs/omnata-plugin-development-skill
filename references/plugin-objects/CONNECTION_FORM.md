@@ -29,7 +29,9 @@ The function will return a list of ConnectionMethod objects which offer the user
 ## Testing
 This procedure can be invoked directly via:
 ```
-call <plugin database>.<plugin schema>.CONNECTION_FORM('<value connectivity option from SUPPORTED_CONNECTIVITY_OPTIONS>');
+call <plugin database>.<plugin schema>.CONNECTION_FORM(OBJECT_CONSTRUCT(
+    'connectivity_option','<value connectivity option from SUPPORTED_CONNECTIVITY_OPTIONS>'
+));
 ```
 (values from the PLUGINS record)
 
