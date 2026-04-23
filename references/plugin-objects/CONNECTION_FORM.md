@@ -18,7 +18,7 @@ An `OBJECT` value using the standard stored proc convention:
 The `connection_form_handler` is responsible for converting results/exceptions to this format.
 
 ## Python handler implementation
-The python handler will be decorated with `@connection_form_handler`
+The python handler will be decorated with `@connection_form_handler`, and the function name itself should always be `run`
 The following function parameters will be expected:
 | Name | Python data type |Description |
 |--------|-------|-------------|
@@ -58,7 +58,7 @@ from omnata_plugin_runtime.forms import (
 from typing import List
 
 @connection_form_handler
-def connection_form(connectivity_option:ConnectivityOption) -> List[ConnectionMethod]:
+def run(connectivity_option:ConnectivityOption) -> List[ConnectionMethod]:
     if connectivity_option == ConnectivityOption.DIRECT:
         return [
             ConnectionMethod(
