@@ -134,7 +134,7 @@ Note: You do not need to call the `REGISTER_PLUGIN` procedure, that is for exter
 
 2. For other procedures, call them directly or through the appropriate API procedure.
 
-3. **Check response format** — should be `{"success": true, "data": ...}` for success.
+3. **Check response format** — should be `{"success": true, "data": ...}` for success. Check the Testing section in the reference docs for specific validation steps.
 
 4. If errors occur:
    - Read the error message from `{"success": false, "error": ...}`
