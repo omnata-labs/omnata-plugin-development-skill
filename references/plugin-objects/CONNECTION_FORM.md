@@ -27,6 +27,14 @@ The following function parameters will be expected:
 The function will return a list of ConnectionMethod objects which offer the user various ways to authenticate, along with the associated form options. See `../data-structures.md` for the structure of these objects.
 
 ## Testing
+This procedure can be invoked directly via:
+```
+call <plugin database>.<plugin schema>.CONNECTION_FORM('<value connectivity option from SUPPORTED_CONNECTIVITY_OPTIONS>');
+```
+(values from the PLUGINS record)
+
+The SAVE_PLUGIN_STORED_PROCEDURE procedure automatically grants usage of the proc to the application role OMNATA_SYNC_ENGINE.OMNATA_ADMINISTRATOR.
+
 The correct behaviour of the stored proc can be verified by taking the 'data' result field value and performing a Pydantic validation:
 ```
 TypeAdapter(List[ConnectionMethod]).validate_python(result['data'])
