@@ -18,7 +18,29 @@ Use this skill when the user wants to:
 ## Prerequisites
 
 - Active Snowflake connection with access to `OMNATA_SYNC_ENGINE` application. The user may advise that the application is installed under a different name, but this is the default.
-- The `OMNATA_PLUGIN_DEVELOPMENT` database must exist for locally developed plugins
+- There are a series of initial setup steps before any plugin development can be done. The status of these can be checked by calling this proc:
+```
+call OMNATA_SYNC_ENGINE.API.CHECK_PLUGIN_DEVELOPMENT_SETUP();
+```
+It returns a structure like so:
+```
+{
+  "success": true,
+  "checks": {
+    "database_accessible": true,    # if false, create a database named OMNATA_PLUGIN_DEVELOPMENT and grant usage to the OMNATA_SYNC_ENGINE application
+    "database_role_exists": true,   # if false, create a database role named OMNATA_PLUGIN_DEVELOPMENT.OMNATA_PLUGIN_DEVELOPMENT_ROLE
+    "role_granted_to_app": true,    # if false, grant usage of the database role OMNATA_PLUGIN_DEVELOPMENT.OMNATA_PLUGIN_DEVELOPMENT_ROLE to the OMNATA_SYNC_ENGINE application
+    "create_schema_grant": true,    # if false, `GRANT CREATE SCHEMA ON DATABASE OMNATA_PLUGIN_DEVELOPMENT TO DATABASE ROLE OMNATA_PLUGIN_DEVELOPMENT`
+    "future_schema_grant": true,    # if false, `GRANT OWNERSHIP ON FUTURE SCHEMAS IN DATABASE OMNATA_PLUGIN_DEVELOPMENT TO DATABASE ROLE OMNATA_PLUGIN_DEVELOPMENT.OMNATA_PLUGIN_DEVELOPMENT_ROLE`
+    "future_procedure_grant": true, # if false, `GRANT OWNERSHIP ON FUTURE PROCEDURES IN DATABASE OMNATA_PLUGIN_DEVELOPMENT TO DATABASE ROLE OMNATA_PLUGIN_DEVELOPMENT.OMNATA_PLUGIN_DEVELOPMENT_ROLE`
+    "future_function_grant": true, # if false, `GRANT OWNERSHIP ON FUTURE FUNCTIONS IN DATABASE OMNATA_PLUGIN_DEVELOPMENT TO DATABASE ROLE OMNATA_PLUGIN_DEVELOPMENT.OMNATA_PLUGIN_DEVELOPMENT_ROLE`
+    "future_secret_grant": true,   # if false, `GRANT OWNERSHIP ON FUTURE SECRETS IN DATABASE OMNATA_PLUGIN_DEVELOPMENT TO DATABASE ROLE OMNATA_PLUGIN_DEVELOPMENT.OMNATA_PLUGIN_DEVELOPMENT_ROLE`
+    "pypi_repository_user_granted": true # if false, `GRANT DATABASE ROLE SNOWFLAKE.PYPI_REPOSITORY_USER TO APPLICATION OMNATA_SYNC_ENGINE`
+  },
+  "allReady": true
+}
+```
+If locally developed plugins already exist, there is no need to run the checks up-front as the setup is already complete.
 
 ## Setup
 
@@ -41,7 +63,7 @@ cortex skill update omnata-labs/omnata-plugin-development-skill
 
 1. **Query** the plugin inventory:
    ```sql
-   SELECT PLUGIN_FQN, NAME, DOCS_URL, SCHEMA, DATABASE
+   SELECT *
    FROM OMNATA_SYNC_ENGINE.DATA_VIEWS.PLUGIN
    WHERE DATABASE = 'OMNATA_PLUGIN_DEVELOPMENT'
    ORDER BY NAME;
@@ -49,12 +71,32 @@ cortex skill update omnata-labs/omnata-plugin-development-skill
 
 2. **Present** the list to the user and ask which plugin to work on (or if creating a new one).
 
-3. If working with an existing plugin, **list its procedures**:
+3. If creating a new plugin, **gather details**:
+   - Plugin name
+   - Description
+   - Vendor Docs URL (if available)
+   - Supported connectivity options (see ConnectivityOption Enum in data-structures.md). Note that very few SaaS applications support privatelink. Do not assume Privatelink support unless explicitly stated in the vendor docs.
+
+You can derive the plugin id from the name by converting to lowercase, removing non-alphanumeric characters and replacing spaces with underscores.
+
+Call the `CONFIGURE_DEVELOPMENT_PLUGIN` procedure to create a new plugin record:
+   ```sql
+   CALL OMNATA_SYNC_ENGINE.API.CONFIGURE_DEVELOPMENT_PLUGIN(
+      PLUGIN_ID => '<derived_plugin_id>',
+      PLUGIN_NAME => '<PLUGIN_NAME>',
+      DESCRIPTION => '<DESCRIPTION>',
+      DOCS_URL => '<DOCS_URL>',
+      SUPPORTED_CONNECTIVITY_OPTIONS => PARSE_JSON('["direct"]')
+   );
+   ```
+This procedure can be called multiple times as details are refined, and it will update the existing record rather than creating duplicates.
+
+4. If working with an existing plugin, **list its procedures**:
    ```sql
    SHOW USER PROCEDURES IN SCHEMA <schema_from_plugin_view>;
    ```
 
-4. To **read an existing procedure body**:
+5. To **read an existing procedure body**:
    ```sql
    SELECT GET_DDL('PROCEDURE', '<fully_qualified_procedure_name>(<arg_types>)');
    ```
@@ -131,20 +173,12 @@ Note: You do not need to call the `REGISTER_PLUGIN` procedure, that is for exter
 
 **Actions:**
 
-1. For **CONNECTION_FORM**, test by calling:
-   ```sql
-   CALL OMNATA_SYNC_ENGINE.API.GET_CONNECTION_FORM('<PLUGIN_FQN>');
-   ```
-   Verify the returned connection methods and form options are correct.
+Check the Testing section in the procedure reference doc for specific validation steps.
 
-2. For other procedures, call them directly or through the appropriate API procedure.
-
-3. **Check response format** — should be `{"success": true, "data": ...}` for success. Check the Testing section in the reference docs for specific validation steps.
-
-4. If errors occur:
-   - Read the error message from `{"success": false, "error": ...}`
-   - Read the procedure body to debug: `SELECT GET_DDL('PROCEDURE', '...');`
-   - Fix and redeploy (return to Step 3)
+If errors occur:
+- Read the error message from `{"success": false, "error": ...}`
+- Read the procedure body to debug: `SELECT GET_DDL('PROCEDURE', '...');`
+- Fix and redeploy (return to Step 3)
 
 **Output:** Working, tested procedure.
 

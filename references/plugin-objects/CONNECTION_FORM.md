@@ -3,7 +3,7 @@
 The CONNECTION_FORM procedure is used by the Sync Engine during the connection configuration process to provide the user with a set of options for how to connect and authenticate to the remote system, and to define what information must be gathered.
 
 When creating a connection, the user initially chooses a connectivity option - see the `ConnectivityOption` enum in `../data-structures.md` for valid values
-The available connectivity options are listed in the SUPPORTED_CONNECTIVITY_OPTIONS array column in the PLUGINS table.
+The available connectivity options are listed in the SUPPORTED_CONNECTIVITY_OPTIONS array column in the PLUGINS table. The plugin
 
 Then, CONNECTION_FORM is invoked to detemine what connection methods are available for that connectivity option. For example, OAuth may be available for direct connections over the internet, but API keys may be used when accessing via Privatelink.
 
