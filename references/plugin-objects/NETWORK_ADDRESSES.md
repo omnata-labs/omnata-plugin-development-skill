@@ -12,7 +12,7 @@ This single argument will be unpacked by the `omnata_plugin_runtime.decorators.n
 An `OBJECT` value using the standard stored proc convention:
 - A successful operation will have `{"success":true,"data":(handler result)}`
 - A failed operation will have `{"success":false,"error":(exception message)}`
-The `connection_form_handler` is responsible for converting results/exceptions to this format.
+The `network_addresses_handler` is responsible for converting results/exceptions to this format.
 
 ## Python handler implementation
 The python handler will be decorated with `@network_addresses_handler`, and the function name itself should always be `run`
