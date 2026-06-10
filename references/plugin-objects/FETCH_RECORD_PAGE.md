@@ -50,6 +50,9 @@ select * from table(<plugin database>.<plugin schema>.FETCH_RECORD_PAGE(OBJECT_C
 ));
 ```
 
+Note: current_run_variables only needs to be used if there are periods in-between the stream state moving.
+If the stream state alone can fetch the next page of results then there's no need to use current_run_variables.
+
 The SAVE_PLUGIN_STORED_PROCEDURE procedure automatically grants usage of the proc to the application role OMNATA_SYNC_ENGINE.OMNATA_ADMINISTRATOR.
 
 ## Procedure body examples
