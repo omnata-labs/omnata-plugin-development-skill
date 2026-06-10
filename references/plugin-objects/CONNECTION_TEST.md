@@ -56,10 +56,17 @@ TypeAdapter(ConnectResponse).validate_python(result['data'])
 from omnata_plugin_runtime.decorators import (
     connection_test_handler
 )
+from omnata_plugin_runtime.omnata_plugin import (
+    ConnectResponse
+)
+from omnata_plugin_runtime.configuration import (
+    ConnectionConfigurationParameters
+)
+from snowflake.snowpark import Session
 import requests
 
 @connection_test_handler
-def run(self, parameters: ConnectionConfigurationParameters) -> ConnectResponse
+def run(self, session: Session, parameters: ConnectionConfigurationParameters) -> ConnectResponse
     if parameters.connection_method == "api_key":
         api_key = parameters.get_connection_secret("api_key").value
         domain = parameters.get_connection_parameter("domain").value

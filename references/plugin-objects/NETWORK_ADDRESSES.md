@@ -59,10 +59,11 @@ from omnata_plugin_runtime.forms import (
     ConnectionMethod,
     FormInputField
 )
+from snowflake.snowpark import Session
 from typing import List
 
 @network_addresses_handler
-def run(parameters:ConnectionConfigurationParameters) -> List[NetworkAddresses]:
+def run(session: Session, parameters:ConnectionConfigurationParameters) -> List[NetworkAddresses]:
     return [
         NetworkAddresses(direct=['api.saasproduct.com'])
     ]

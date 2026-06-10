@@ -21,13 +21,13 @@ The following function parameters will be expected:
 |--------|-------|-------------|
 | `parameters` | `omnata_plugin_runtime.configuration.ConnectionConfigurationParameters` | The connection parameters entered by the user |
 
-The function will raise an exception if the connection test fails, with a helpful message. If the connection test succeeds, the function returns a `omnata_plugin_runtime.omnata_plugin.ConnectResponse` object (see `../data-structures.md`)
+The function will raise an exception if the connection test fails, with a helpful message. If the connection test succeeds, the function returns a `omnata_plugin_runtime.forms.InboundSyncConfigurationForm` object (see `../data-structures.md`)
 
 ## Testing
 This procedure cannot be invoked until the external access integration is in place and approved by an administrator.
 Afterwards, the procedure can be invoked directly via:
 ```
-call <plugin database>.<plugin schema>.CONNECTION_FORM(OBJECT_CONSTRUCT(
+call <plugin database>.<plugin schema>.INBOUND_CONFIGURATION_FORM(OBJECT_CONSTRUCT(
     'connectivity_option','<value connectivity option from SUPPORTED_CONNECTIVITY_OPTIONS>',
     'connection_method','<chosen connection method>',
     'connection_parameters',{ (non-secret parameters from the connection form) },
@@ -40,24 +40,30 @@ The SAVE_PLUGIN_STORED_PROCEDURE procedure automatically grants usage of the pro
 
 The correct behaviour of the stored proc can be verified by taking the 'data' result field value and performing a Pydantic validation:
 ```
-TypeAdapter(ConnectResponse).validate_python(result['data'])
+TypeAdapter(InboundSyncConfigurationForm).validate_python(result['data'])
 ```
 
 ## Procedure body examples
 
 ```
+from omnata_plugin_runtime.forms import (
+    FormCheckboxField,
+    InboundSyncConfigurationForm
+)
 from omnata_plugin_runtime.decorators import (
     connection_test_handler
 )
-import requests
+from omnata_plugin_runtime.configuration import (
+    ConnectionConfigurationParameters,
+)
 
-@connection_test_handler
-def run(self, parameters: ConnectionConfigurationParameters) -> ConnectResponse
-    if parameters.connection_method == "api_key":
-        api_key = parameters.get_connection_secret("api_key").value
-        domain = parameters.get_connection_parameter("domain").value
-        response = requests.get(f"https://{domain}/v2/account_info")
-        response.raise_for_error()
-        return ConnectResponse()
-    raise ValueError(f"Unknown connection method {parameters.connection_method}")
+@inbound_configuration_form_handler
+def run(session: Session, parameters: ConnectionConfigurationParameters):
+    return InboundSyncConfigurationForm(fields=[
+        FormCheckboxField(name='use_bulk_api',
+            label='Use Bulk API',
+            required=True,
+            reload_on_change=True,
+            help_text='Check this box to use the high-throughput bulk API for this sync. Uncheck to use the standard API.')
+    ])
 ```
