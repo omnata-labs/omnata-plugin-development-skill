@@ -3,7 +3,7 @@
 The CONNECTION_TEST procedure is used by the Sync Engine during the connection configuration process to check that the provided credentials work against the target system.
 
 When creating a connection, the user initially chooses a connectivity option - see the `ConnectivityOption` enum in `../data-structures.md` for valid values
-The available connectivity options are listed in the SUPPORTED_CONNECTIVITY_OPTIONS array column in the PLUGINS table. The plugin
+The available connectivity options are listed in the SUPPORTED_CONNECTIVITY_OPTIONS array column in the PLUGINS table.
 
 Then, CONNECTION_FORM is invoked to detemine what connection methods are available for that connectivity option. For example, OAuth may be available for direct connections over the internet, but API keys may be used when accessing via Privatelink.
 
