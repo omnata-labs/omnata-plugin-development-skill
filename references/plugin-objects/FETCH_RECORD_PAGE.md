@@ -7,8 +7,8 @@ system and yields them along with the updated stream state.
 
 It lives in the plugin's schema (for interactive plugins:
 `OMNATA_PLUGIN_DEVELOPMENT.<PLUGIN_ID>.FETCH_RECORD_PAGE`) and is generated with the
-`@snowflake_udtf` decorator from `omnata_plugin_runtime.decorators`, whose handler class is named
-`FetchRecordPage`.
+`@inbound_sync_rest_paginated_handler` decorator from `omnata_plugin_runtime.decorators`, applied
+to a handler class named `FetchRecordPage`.
 
 ## Signature
 
@@ -33,7 +33,7 @@ RETURNS TABLE (
 
 | Argument | Type | Description |
 |---|---|---|
-| `connection_parameters` | object | A connection-configuration object built by the caller. It carries `operation` (always `'inbound_sync_rest_paginated'`), `connectivity_option`, `connection_method`, `connection_parameters`, and the secret names `oauth_secret` / `other_secrets`. The `@snowflake_udtf` decorator resolves the secrets and converts this into a `ConnectionConfigurationParameters` instance before your `process()` runs. |
+| `parameters` | object | A connection-configuration object built by the caller. It carries `operation` (always `'inbound_sync_rest_paginated'`), `connectivity_option`, `connection_method`, `connection_parameters`, and the secret names `oauth_secret` / `other_secrets`. The `@inbound_sync_rest_paginated_handler` decorator resolves the secrets and converts this into an `InboundSyncConfigurationParameters` instance before your `process()` runs. |
 | `stream_name` | varchar | The stream (object) being fetched, e.g. `companies`. |
 | `cursor_field_name` | varchar | The cursor field for incremental syncs, or an empty string for full refresh / when the stream has no cursor. |
 | `stream_state` | object | The persisted state for this stream (the `new_state` your plugin last returned). Empty (`{}`) on the first run or a full refresh. Use it to resume from the last cursor position. |
@@ -61,26 +61,26 @@ returns an empty page, or once you have paged past `sync_run_start_time`.
 
 ## How `process()` receives the arguments
 
-The `@snowflake_udtf` decorator passes the resolved `ConnectionConfigurationParameters` as the
-first argument, then forwards the remaining UDTF arguments positionally. `sync_run_start_time` is
-the trailing argument:
+The `@inbound_sync_rest_paginated_handler` decorator passes the resolved
+`InboundSyncConfigurationParameters` as the first argument, then forwards the remaining UDTF
+arguments positionally. `sync_run_start_time` is the trailing argument:
 
 ```python
 from typing import Iterable, Tuple
-from omnata_plugin_runtime.configuration import ConnectionConfigurationParameters
-from omnata_plugin_runtime.decorators import snowflake_udtf
+from omnata_plugin_runtime.configuration import InboundSyncConfigurationParameters
+from omnata_plugin_runtime.decorators import inbound_sync_rest_paginated_handler
 
-@snowflake_udtf
+@inbound_sync_rest_paginated_handler
 class FetchRecordPage:
     def process(
         self,
-        connection_parameters: ConnectionConfigurationParameters,
+        connection_parameters: InboundSyncConfigurationParameters,
         stream_name: str,
         cursor_field_name: str,
         stream_state: dict,
         current_run_variables: dict,
         page_size: int,
-        sync_run_start_time,        # new: the sync run's start time (TIMESTAMP_LTZ)
+        sync_run_start_time,        # the sync run's start time (TIMESTAMP_LTZ)
     ) -> Iterable[Tuple[dict, dict, dict]]:
         api_domain = connection_parameters.get_connection_parameter('api_domain').value
         token = connection_parameters.get_connection_secret('api_key').value
@@ -104,14 +104,6 @@ class FetchRecordPage:
         for record in results:
             yield (record, new_state, run_variables)
 ```
-
-### Backward compatibility
-
-`sync_run_start_time` is optional from the plugin author's perspective. The `@snowflake_udtf`
-decorator forwards only as many trailing arguments as your `process()` method declares, so a
-`process()` written before this argument existed (one that stops at `page_size`) continues to
-work unchanged — it simply doesn't receive `sync_run_start_time`. Declare the parameter only if
-you intend to use it.
 
 ## How it's invoked
 
