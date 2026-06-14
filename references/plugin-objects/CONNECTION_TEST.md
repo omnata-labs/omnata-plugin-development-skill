@@ -66,7 +66,7 @@ from snowflake.snowpark import Session
 import requests
 
 @connection_test_handler
-def run(self, session: Session, parameters: ConnectionConfigurationParameters) -> ConnectResponse
+def run(session: Session, parameters: ConnectionConfigurationParameters) -> ConnectResponse:
     if parameters.connection_method == "api_key":
         api_key = parameters.get_connection_secret("api_key").value
         domain = parameters.get_connection_parameter("domain").value

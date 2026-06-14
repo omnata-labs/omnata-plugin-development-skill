@@ -59,6 +59,19 @@ and `run_variables` from each page into the next call's `stream_state` and
 therefore yield no records once the stream is exhausted — for example, once the external API
 returns an empty page, or once you have paged past `sync_run_start_time`.
 
+## State management
+
+**Important:** Only set `new_state` to a meaningful cursor value on the final page of a pagination
+sequence (i.e. when there is no next page). If you update `new_state` on every page, the engine
+checkpoints it after each page — so if the sync is interrupted mid-pagination, the next run will
+resume from the intermediate cursor and skip records that were fetched but not yet committed.
+
+The safe pattern is:
+- On intermediate pages (more data remains): yield `(record, None, run_variables)` — this leaves
+  the persisted state unchanged.
+- On the final page (no more data): yield `(record, new_state, run_variables)` with the updated
+  cursor position.
+
 ## How `process()` receives the arguments
 
 The `@inbound_sync_rest_paginated_handler` decorator passes the resolved

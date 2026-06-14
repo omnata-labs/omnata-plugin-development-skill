@@ -120,8 +120,8 @@ Note: You do not need to call the `REGISTER_PLUGIN` procedure, that is for exter
      - `CONNECTION_TEST` — See [references/plugin-objects/CONNECTION_TEST.md](references/plugin-objects/CONNECTION_TEST.md) for details on expected   parameters, return values, and handler implementation.
      - Other procedure types as documented in the plugin spec
    b) Inbound Sync Configuration:
-     - `INBOUND_CONFIGURATION_FORM` — See [references/plugin-objects/INBOUND_CONFIGURATION_FORM.md](references/plugin-objects/INBOUND_CONFIGURATION_FORM.md) for details on expected parameters, return values, and handler implementation.
-     - `INBOUND_STREAM_LIST` — See [references/plugin-objects/INBOUND_STREAM_LIST.md](references/plugin-objects/INBOUND_STREAM_LIST.md) for details on expected parameters, return values, and handler implementation.
+     - `INBOUND_SYNC_PARAMETERS` — See [references/plugin-objects/INBOUND_SYNC_PARAMETERS.md](references/plugin-objects/INBOUND_SYNC_PARAMETERS.md) for details on expected parameters, return values, and handler implementation.
+     - `LIST_STREAMS` — See [references/plugin-objects/LIST_STREAMS.md](references/plugin-objects/LIST_STREAMS.md) for details on expected parameters, return values, and handler implementation.
    c) Inbound Sync Execution:
      - `FETCH_RECORD_PAGE` — For streams of type "simple_pagination". See [references/plugin-objects/FETCH_RECORD_PAGE.md](references/plugin-objects/FETCH_RECORD_PAGE.md) for details on expected parameters, return values, and handler implementation.
    d) Outbound Sync Configuration:

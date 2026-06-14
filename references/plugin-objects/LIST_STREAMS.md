@@ -1,6 +1,6 @@
-# INBOUND_STREAM_LIST
+# LIST_STREAMS
 
-The INBOUND_STREAM_LIST procedure is used by the Sync Engine during the sync configuration process for inbound syncs, to provide a list of streams (objects from the source application) for the user to choose from.
+The LIST_STREAMS procedure is used by the Sync Engine during the sync configuration process for inbound syncs, to provide a list of streams (objects from the source application) for the user to choose from.
 
 ## Stored Procedure signature
 The Stored Procedure must contain a single OBJECT column named PARAMETERS.
@@ -13,7 +13,7 @@ An `OBJECT` value using the standard stored proc convention:
 The `inbound_stream_list_handler` is responsible for converting results/exceptions to this format.
 
 ## Python handler implementation
-The python handler will be decorated with `@inbound_configuration_form_handler`, and the function name itself should always be `run`
+The python handler will be decorated with `@inbound_stream_list_handler`, and the function name itself should always be `run`
 The following function parameters will be expected:
 | Name | Python data type |Description |
 |--------|-------|-------------|
@@ -25,7 +25,7 @@ The function will raise an exception if an error is encountered, with a helpful 
 This procedure cannot be invoked until the external access integration is in place and approved by an administrator.
 Afterwards, the procedure can be invoked directly via:
 ```
-call <plugin database>.<plugin schema>.INBOUND_STREAM_LIST(OBJECT_CONSTRUCT(
+call <plugin database>.<plugin schema>.LIST_STREAMS(OBJECT_CONSTRUCT(
     'connectivity_option','<value connectivity option from SUPPORTED_CONNECTIVITY_OPTIONS>',
     'connection_method','<chosen connection method>',
     'connection_parameters',{ (non-secret parameters from the connection form) },

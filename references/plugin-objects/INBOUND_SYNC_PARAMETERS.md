@@ -1,6 +1,6 @@
-# INBOUND_CONFIGURATION_FORM
+# INBOUND_SYNC_PARAMETERS
 
-The INBOUND_CONFIGURATION_FORM procedure is used by the Sync Engine during the sync configuration process for inbound syncs, to determine which configuration form fields should be shown to the user before selecting inbound streams.
+The INBOUND_SYNC_PARAMETERS procedure is used by the Sync Engine during the sync configuration process for inbound syncs, to determine which configuration form fields should be shown to the user before selecting inbound streams.
 
 These field values are then available during stream listing and the sync process.
 
@@ -27,7 +27,7 @@ The function will raise an exception if the connection test fails, with a helpfu
 This procedure cannot be invoked until the external access integration is in place and approved by an administrator.
 Afterwards, the procedure can be invoked directly via:
 ```
-call <plugin database>.<plugin schema>.INBOUND_CONFIGURATION_FORM(OBJECT_CONSTRUCT(
+call <plugin database>.<plugin schema>.INBOUND_SYNC_PARAMETERS(OBJECT_CONSTRUCT(
     'connectivity_option','<value connectivity option from SUPPORTED_CONNECTIVITY_OPTIONS>',
     'connection_method','<chosen connection method>',
     'connection_parameters',{ (non-secret parameters from the connection form) },
@@ -51,7 +51,7 @@ from omnata_plugin_runtime.forms import (
     InboundSyncConfigurationForm
 )
 from omnata_plugin_runtime.decorators import (
-    connection_test_handler
+    inbound_configuration_form_handler
 )
 from omnata_plugin_runtime.configuration import (
     ConnectionConfigurationParameters,
