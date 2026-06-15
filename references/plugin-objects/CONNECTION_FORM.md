@@ -42,9 +42,12 @@ The correct behaviour of the stored proc can be verified by taking the 'data' re
 TypeAdapter(List[ConnectionMethod]).validate_python(result['data'])
 ```
 
+When the ConnectionMethod contains a value for oauth_template, the template values are used to configure the Snowflake security integration.
+Whenever placeholder values e.g. `<Client ID>` are used, these are rendered as form fields so that the user must provide values.
+
 ## Procedure body examples
 
-### OAuth over internet, API key over privatelink
+### OAuth over internet (both styles), API key over privatelink
 
 ```
 from omnata_plugin_runtime.decorators import (
@@ -55,7 +58,8 @@ from omnata_plugin_runtime.configuration import (
 )
 from omnata_plugin_runtime.forms import (
     ConnectionMethod,
-    FormInputField
+    FormInputField,
+    SecurityIntegrationTemplateAuthorizationCode
 )
 from typing import List
 
@@ -86,6 +90,17 @@ def run(connectivity_option:ConnectivityOption) -> List[ConnectionMethod]:
                         help_text="The Consumer Secret for the OAuth App"
                     )
                 ]
+            ),
+            ConnectionMethod(
+                name="OAuth (Authorization Code)",
+                fields=[],
+                oauth_template=SecurityIntegrationTemplateAuthorizationCode(
+                    oauth_client_id='<Client ID from custom app>',
+                    oauth_client_secret='<Client Secret from custom app>',
+                    oauth_token_endpoint='https://acme.app/token',
+                    oauth_authorization_endpoint='https://acme.app/oauth2/v2/auth',
+                    oauth_allowed_scopes=['acme.all.read','acme.all.write'],
+                )
             )
         ]
     elif connectivity_option == ConnectivityOption.PRIVATELINK:
