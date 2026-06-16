@@ -28,7 +28,12 @@ The following function parameters will be expected:
 |--------|-------|-------------|
 | `parameters` | `omnata_plugin_runtime.configuration.ConnectionConfigurationParameters` | The connection parameters entered by the user |
 
-The function will raise an exception if the connection test fails, with a helpful message. If the connection test succeeds, the function returns a `omnata_plugin_runtime.omnata_plugin.ConnectResponse` object (see `../data-structures.md`)
+The function will raise an exception if the connection test fails, with a helpful message. If the connection test succeeds, the function returns a `omnata_plugin_runtime.omnata_plugin.ConnectResponse` object (see `../data-structures.md`).
+
+Note: For connection methods utilizing a native OAuth security integration, the access token will be accessible by calling:
+```
+parameters.get_connection_secret("access_token").value
+```
 
 ## Testing
 This procedure cannot be invoked until the external access integration is in place and approved by an administrator.
