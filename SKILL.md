@@ -120,7 +120,7 @@ Note: You do not need to call the `REGISTER_PLUGIN` procedure, that is for exter
      - `CONNECTION_TEST` — See [references/plugin-objects/CONNECTION_TEST.md](references/plugin-objects/CONNECTION_TEST.md) for details on expected   parameters, return values, and handler implementation.
      - Other procedure types as documented in the plugin spec
    b) Inbound Sync Configuration:
-     - `INBOUND_SYNC_PARAMETERS` — See [references/plugin-objects/INBOUND_SYNC_PARAMETERS.md](references/plugin-objects/INBOUND_SYNC_PARAMETERS.md) for details on expected parameters, return values, and handler implementation.
+     - `INBOUND_SYNC_PARAMETERS` — The **only** procedure name the engine calls for the inbound sync parameter form. Do NOT use `INBOUND_CONFIGURATION_FORM` — that name is never invoked. See [references/plugin-objects/INBOUND_SYNC_PARAMETERS.md](references/plugin-objects/INBOUND_SYNC_PARAMETERS.md) for the exact signature and handler.
      - `LIST_STREAMS` — See [references/plugin-objects/LIST_STREAMS.md](references/plugin-objects/LIST_STREAMS.md) for details on expected parameters, return values, and handler implementation.
    c) Inbound Sync Execution:
      - `FETCH_RECORD_PAGE` — For streams of type "simple_pagination". See [references/plugin-objects/FETCH_RECORD_PAGE.md](references/plugin-objects/FETCH_RECORD_PAGE.md) for details on expected parameters, return values, and handler implementation.
@@ -156,7 +156,12 @@ Note: You do not need to call the `REGISTER_PLUGIN` procedure, that is for exter
 
 **Actions:**
 
-1. **Call SAVE_PLUGIN_STORED_PROCEDURE** to create or update:
+1. **Prerequisite: The plugin must be registered first.** `SAVE_PLUGIN_STORED_PROCEDURE` will fail
+   with "Plugin not found" unless the plugin has already been registered via
+   `CONFIGURE_DEVELOPMENT_PLUGIN` (Step 1). Always register/configure the plugin before saving
+   procedures.
+
+2. **Call SAVE_PLUGIN_STORED_PROCEDURE** to create or update:
    ```sql
    CALL OMNATA_SYNC_ENGINE.API.SAVE_PLUGIN_STORED_PROCEDURE(
        '<PLUGIN_FQN>',
@@ -166,14 +171,14 @@ Note: You do not need to call the `REGISTER_PLUGIN` procedure, that is for exter
    );
    ```
    Where:
-   - `PLUGIN_FQN` — from the PLUGIN view (Step 1)
-   - `PROCEDURE_NAME` — e.g., 'CONNECTION_FORM', 'CONNECTION_TEST'
+   - `PLUGIN_FQN` — the **logical** plugin FQN from the PLUGIN view (e.g. `OMNATA__NOTION_V2`). This is NOT the database.schema path (`OMNATA_PLUGIN_DEVELOPMENT.NOTION_V2`) — it is the value from the `FQN` column in `OMNATA_SYNC_ENGINE.DATA_VIEWS.PLUGIN`.
+   - `PROCEDURE_NAME` — e.g., 'CONNECTION_FORM', 'CONNECTION_TEST', 'INBOUND_SYNC_PARAMETERS'
    - `python_body` — the Python code string from Step 3
    - `packages_json` — JSON array of Snowflake Anaconda packages, e.g., `'["requests","omnata-plugin-runtime"]'`
 
-2. **Check the response** for success/failure.
+3. **Check the response** for success/failure.
 
-3. **Verify deployment** by listing procedures again:
+4. **Verify deployment** by listing procedures again:
    ```sql
    SHOW USER PROCEDURES IN SCHEMA <schema>;
    ```
@@ -220,7 +225,9 @@ A deployed and tested Omnata plugin procedure registered with the Sync Engine.
 
 3. **Decorator errors** — Ensure `omnata-plugin-runtime` is included in the packages JSON
 
-## Notes
+## General Principles
 
-- Procedures are not created directly with CREATE PROCEDURE — always use `SAVE_PLUGIN_STORED_PROCEDURE` since external access integrations and secrets must be attached
-- The `omnata-plugin-runtime` package is available from PyPi
+- **Document exact signatures:** For each plugin procedure, the reference doc specifies the exact SQL signature the engine calls and the expected return shape. Always match these exactly.
+- **Prefer plain `run(session, ...)` functions** returning the documented dict over `omnata_plugin_runtime` decorators, unless the decorator's expected input exactly matches what the engine passes. Decorators that unpack a single OBJECT payload will fail if the engine passes positional arguments instead.
+- Procedures are not created directly with CREATE PROCEDURE — always use `SAVE_PLUGIN_STORED_PROCEDURE` since external access integrations and secrets must be attached.
+- The `omnata-plugin-runtime` package is available from PyPi.
