@@ -120,8 +120,8 @@ Note: You do not need to call the `REGISTER_PLUGIN` procedure, that is for exter
      - `CONNECTION_TEST` — See [references/plugin-objects/CONNECTION_TEST.md](references/plugin-objects/CONNECTION_TEST.md) for details on expected   parameters, return values, and handler implementation.
      - Other procedure types as documented in the plugin spec
    b) Inbound Sync Configuration:
-     - `INBOUND_SYNC_PARAMETERS` — The **only** procedure name the engine calls for the inbound sync parameter form. Do NOT use `INBOUND_CONFIGURATION_FORM` — that name is never invoked. See [references/plugin-objects/INBOUND_SYNC_PARAMETERS.md](references/plugin-objects/INBOUND_SYNC_PARAMETERS.md) for the exact signature and handler.
-     - `LIST_STREAMS` — See [references/plugin-objects/LIST_STREAMS.md](references/plugin-objects/LIST_STREAMS.md) for details on expected parameters, return values, and handler implementation.
+     - `INBOUND_CONFIGURATION_FORM` — See [references/plugin-objects/INBOUND_CONFIGURATION_FORM.md](references/plugin-objects/INBOUND_CONFIGURATION_FORM.md) for details on expected parameters, return values, and handler implementation.
+     - `INBOUND_STREAM_LIST` — See [references/plugin-objects/INBOUND_STREAM_LIST.md](references/plugin-objects/INBOUND_STREAM_LIST.md) for details on expected parameters, return values, and handler implementation.
    c) Inbound Sync Execution:
      - `FETCH_RECORD_PAGE` — For streams of type "simple_pagination". See [references/plugin-objects/FETCH_RECORD_PAGE.md](references/plugin-objects/FETCH_RECORD_PAGE.md) for details on expected parameters, return values, and handler implementation.
    d) Outbound Sync Configuration:
@@ -129,6 +129,8 @@ Note: You do not need to call the `REGISTER_PLUGIN` procedure, that is for exter
    e) Outbound Sync Execution:
      - `APPLY_RECORD_BATCH` — For the "batched_rest" outbound style. See [references/plugin-objects/APPLY_RECORD_BATCH.md](references/plugin-objects/APPLY_RECORD_BATCH.md) for details on expected parameters, return values, and handler implementation.
 
+Note: During initial implementation, the ideal order is to implement connection creation procedures (CONNECTION_FORM, NETWORK_ADDRESSES, CONNECTION_TEST) first, and test CONNECTION_FORM and NETWORK_ADDRESSES via direct invocation. Then have the user test CONNECTION_TEST via the plugin builder UI, creating a connection.
+After this, the sync-related procedures can be implemented and tested, using the connection created in the previous step.
 
 2. **Fetch external docs** if needed — use the plugin's `docs_url` from Step 1 to understand the target system's API:
    ```
@@ -195,6 +197,15 @@ If errors occur:
 - Read the error message from `{"success": false, "error": ...}`
 - Read the procedure body to debug: `SELECT GET_DDL('PROCEDURE', '...');`
 - Fix and redeploy (return to Step 3)
+
+Once you have a definitive result, **record the test outcome** so it shows in the plugin builder UI:
+```sql
+CALL OMNATA_SYNC_ENGINE.API.SET_PLUGIN_OBJECT_DEVELOPMENT_STATE(
+    '<PLUGIN_FQN>', '<OBJECT_NAME>', 'ai_test_state', 'passed');  -- use 'failed' if it did not pass
+```
+Where `<OBJECT_NAME>` is the procedure/function name being tested (e.g. `CONNECTION_TEST`,
+`FETCH_RECORD_PAGE` — the names from Step 2). You do not need to set `creation_state`:
+`SAVE_PLUGIN_STORED_PROCEDURE` marks the object as `created` automatically when you deploy it.
 
 **Output:** Working, tested procedure.
 
