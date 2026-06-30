@@ -242,3 +242,4 @@ A deployed and tested Omnata plugin procedure registered with the Sync Engine.
 - **Prefer plain `run(session, ...)` functions** returning the documented dict over `omnata_plugin_runtime` decorators, unless the decorator's expected input exactly matches what the engine passes. Decorators that unpack a single OBJECT payload will fail if the engine passes positional arguments instead.
 - Procedures are not created directly with CREATE PROCEDURE — always use `SAVE_PLUGIN_STORED_PROCEDURE` since external access integrations and secrets must be attached.
 - The `omnata-plugin-runtime` package is available from PyPi.
+- Existing procedures for other plugins can be a useful reference point, but if at any point they clash with this skill's reference docs, the reference docs take precedence. The engine will call the procedure with the documented signature, and the procedure must return the documented shape.

@@ -72,6 +72,9 @@ The safe pattern is:
 - On the final page (no more data): yield `(record, new_state, run_variables)` with the updated
   cursor position.
 
+Under no circumstances should the plugin attempt to manage a full refresh sync run vs incremental, instead it is up to the sync engine to manage the lifecycle.
+With that in mind, the only logical difference between an initial page and subsequent pages is that, in the absence of state, the plugin must decide how to start from the earliest page.
+
 ## How `process()` receives the arguments
 
 The `@inbound_sync_rest_paginated_handler` decorator passes the resolved
