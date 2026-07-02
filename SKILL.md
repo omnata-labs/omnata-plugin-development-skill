@@ -130,7 +130,7 @@ Note: You do not need to call the `REGISTER_PLUGIN` procedure, that is for exter
    c) Inbound Sync Execution:
      - `FETCH_RECORD_PAGE` — For streams of type "simple_pagination". See [references/plugin-objects/FETCH_RECORD_PAGE.md](references/plugin-objects/FETCH_RECORD_PAGE.md) for details on expected parameters, return values, and handler implementation.
    d) Outbound Sync Configuration:
-     - `OUTBOUND_CONFIGURATION_FORM` — See [references/plugin-objects/OUTBOUND_CONFIGURATION_FORM.md](references/plugin-objects/OUTBOUND_CONFIGURATION_FORM.md) for details on expected parameters, return values, and handler implementation. Must include the mandatory `object` field identifying the destination object.
+     - `OUTBOUND_SYNC_PARAMETERS` — See [references/plugin-objects/OUTBOUND_SYNC_PARAMETERS.md](references/plugin-objects/OUTBOUND_SYNC_PARAMETERS.md) for details on expected parameters, return values, and handler implementation. Must include the mandatory `object` field identifying the destination object.
    e) Outbound Sync Execution:
      - `APPLY_RECORD_BATCH` — For the "batched_rest" outbound style. See [references/plugin-objects/APPLY_RECORD_BATCH.md](references/plugin-objects/APPLY_RECORD_BATCH.md) for details on expected parameters, return values, and handler implementation.
 
