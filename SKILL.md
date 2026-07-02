@@ -86,10 +86,15 @@ Call the `CONFIGURE_DEVELOPMENT_PLUGIN` procedure to create a new plugin record:
       PLUGIN_NAME => '<PLUGIN_NAME>',
       DESCRIPTION => '<DESCRIPTION>',
       DOCS_URL => '<DOCS_URL>',
-      SUPPORTED_CONNECTIVITY_OPTIONS => PARSE_JSON('["direct"]')
+      SUPPORTED_CONNECTIVITY_OPTIONS => PARSE_JSON('["direct"]'),
+      ICON_SOURCE => '<ICON_SOURCE>'
    );
    ```
-This procedure can be called multiple times as details are refined, and it will update the existing record rather than creating duplicates.
+This procedure can be called multiple times as details are refined, and it will update the existing record rather than creating duplicates. All parameters other than `PLUGIN_ID` are optional; omitted parameters are left unchanged on an existing plugin.
+
+`ICON_SOURCE` sets the plugin's icon. It is stored as raw SVG markup (the literal `<svg>...</svg>` string, not a URL or base64 data URI) and rendered directly in the UI. Keep it small (a few KB — well under the 256 KB ceiling) and avoid scriptable content (`<script>`, `<foreignObject>`, inline `on*` handlers, `javascript:` URLs), as such content is stripped before display. Omit this parameter if you don't have an icon yet — it can be added on a later call.
+
+The outer <svg> element should have width="100%" and height="100%" so it scales to fit wherever it's shown. Omit this parameter to use a placeholder icon.
 
 4. If working with an existing plugin, **list its procedures**:
    ```sql
