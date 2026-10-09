@@ -1,0 +1,5 @@
+{
+  "name": "omnata-plugin-development-skill",
+  "description": "Guide for building plugins/connectors for the Omnata Sync Engine on Snowflake. Supports step-by-step and one-shot development modes, design decision prompts, and end-to-end sync iteration. Use when: creating a new Omnata plugin, building a plugin end to end, modifying an existing plugin procedure, debugging plugin behavior, deploying plugin changes, iterating on sync errors.",
+  "version": "1.0.0"
+}
