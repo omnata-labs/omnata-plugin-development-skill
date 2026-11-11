@@ -10,7 +10,7 @@ This mirrors the traditional plugin `apply()` / `enqueue_results` pattern, but t
 the UDTF directly (`OVER (PARTITION BY 1)`) instead of a `SYNC` procedure coordinating the run.
 
 It lives in the plugin's schema (for interactive plugins:
-`OMNATA_PLUGIN_DEVELOPMENT.<PLUGIN_ID>.APPLY_RECORD_BATCH`) and is generated with the
+`OMNATA_PLUGIN_DEVELOPMENT.<draft version schema>.APPLY_RECORD_BATCH`) and is generated with the
 `@outbound_sync_batched_handler` decorator from `omnata_plugin_runtime.decorators`, applied to a
 handler class named `ApplyRecordBatch`.
 

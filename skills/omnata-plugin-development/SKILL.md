@@ -258,36 +258,108 @@ After this, the sync-related procedures can be implemented and tested, using the
 
 ### Step 4: Deploy the Procedure
 
-**Goal:** Register/update the procedure via the Omnata API.
+**Goal:** Create or update the procedure/function directly in the plugin's **draft version schema**.
+
+Plugins are versioned. Each version has its own schema, at most one version is a draft, and published
+versions are locked (owned by `OMNATA_PLUGIN_DEVELOPMENT.OMNATA_PLUGIN_PUBLISHED_ROLE`, which only the
+application holds). You write code into the draft only, using plain `CREATE OR ALTER` /
+`CREATE OR REPLACE` statements -- there is no need to go through an Omnata API procedure.
 
 **Actions:**
 
-1. **Prerequisite: The plugin must be registered first.** `SAVE_PLUGIN_STORED_PROCEDURE` will fail
-   with "Plugin not found" unless the plugin has already been registered via
-   `CONFIGURE_DEVELOPMENT_PLUGIN` (Step 1). Always register/configure the plugin before saving
-   procedures.
+1. **Prerequisite: the plugin must be registered first** via `CONFIGURE_DEVELOPMENT_PLUGIN` (Step 1).
 
-2. **Call SAVE_PLUGIN_STORED_PROCEDURE** to create or update:
+2. **Determine the version schema to write to.** Look up the plugin's draft version:
    ```sql
-   CALL OMNATA_SYNC_ENGINE.API.SAVE_PLUGIN_STORED_PROCEDURE(
-       '<PLUGIN_FQN>',
-       '<PROCEDURE_NAME>',
-       '<python_body>',
-       '<packages_json>'
-   );
+   SELECT VERSION_NUMBER, VERSION_STATE, SCHEMA
+   FROM OMNATA_SYNC_ENGINE.DATA_VIEWS.PLUGIN_VERSION
+   WHERE PLUGIN_FQN = '<PLUGIN_FQN>' AND VERSION_STATE != 'deleted'
+   ORDER BY VERSION_NUMBER;
    ```
-   Where:
-   - `PLUGIN_FQN` -- the **logical** plugin FQN from the PLUGIN view (e.g. `OMNATA__NOTION_V2`). This is NOT the database.schema path (`OMNATA_PLUGIN_DEVELOPMENT.NOTION_V2`) -- it is the value from the `FQN` column in `OMNATA_SYNC_ENGINE.DATA_VIEWS.PLUGIN`.
-   - `PROCEDURE_NAME` -- e.g., 'CONNECTION_FORM', 'CONNECTION_TEST', 'INBOUND_SYNC_PARAMETERS'
-   - `python_body` -- the Python code string from Step 3
-   - `packages_json` -- JSON array of Snowflake Anaconda packages, e.g., `'["requests","omnata-plugin-runtime"]'`
+   - If a row has `VERSION_STATE = 'draft'`, write to `<plugin database>.<that SCHEMA>`.
+   - If every version is `published`, create a new draft first (it clones the latest published
+     version, or `BASED_ON_VERSION_NUMBER` if given), then re-run the query above:
+     ```sql
+     CALL OMNATA_SYNC_ENGINE.API.CREATE_PLUGIN_DRAFT_VERSION('<PLUGIN_FQN>', NULL, '<what is changing>');
+     ```
+   - If no rows are returned at all, the plugin pre-dates versioning: use the `SCHEMA` from
+     `OMNATA_SYNC_ENGINE.DATA_VIEWS.PLUGIN`.
 
-3. **Check the response** for success/failure.
+   For reference, version 1 lives in the plugin's home schema (the `SCHEMA` in the PLUGIN view, e.g.
+   `NOTION_V2`) and version *n* lives in `<home schema>__V<n>` (e.g. `NOTION_V2__V3`). Always read
+   the schema from `PLUGIN_VERSION` rather than constructing it. Never attempt to modify a published
+   version's schema -- it will fail with an ownership error, and any change would be detected and
+   block the syncs pinned to it. `PLUGIN_FQN` here is the **logical** FQN (the `FQN` column in the
+   PLUGIN view, e.g. `OMNATA__NOTION_V2`), not the database.schema path.
 
-4. **Verify deployment** by listing procedures again:
+3. **Create the object.** Use the exact signature from the reference doc. Stored procedures **must**
+   be declared `EXECUTE AS OWNER` -- the engine checks every procedure before using a version and
+   refuses to run a version containing a caller's rights procedure (a caller's rights procedure would
+   run with the application's privileges, and would expose its body to callers). Do not add
+   `EXTERNAL_ACCESS_INTEGRATIONS` or `SECRETS` clauses (see step 4 below).
+
+   Procedure (CONNECTION_FORM, NETWORK_ADDRESSES, CONNECTION_TEST, LIST_STREAMS,
+   INBOUND_SYNC_PARAMETERS, OUTBOUND_SYNC_PARAMETERS, ...):
    ```sql
-   SHOW USER PROCEDURES IN SCHEMA <schema>;
+   CREATE OR ALTER PROCEDURE <plugin database>.<draft schema>.CONNECTION_TEST(PARAMETERS OBJECT)
+   RETURNS OBJECT
+   LANGUAGE PYTHON
+   RUNTIME_VERSION = '3.11'
+   ARTIFACT_REPOSITORY = snowflake.snowpark.pypi_shared_repository
+   PACKAGES = ('snowflake-snowpark-python','requests','omnata-plugin-runtime')
+   HANDLER = 'run'
+   EXECUTE AS OWNER
+   AS $$
+   <python body>
+   $$;
    ```
+   Table functions (FETCH_RECORD_PAGE, APPLY_RECORD_BATCH) use `CREATE OR ALTER FUNCTION ...
+   RETURNS TABLE (...)` with the handler class name from the reference doc (`FetchRecordPage`,
+   `ApplyRecordBatch`). `EXECUTE AS` does not apply to functions.
+
+   Ownership is assigned automatically: future grants configured during setup make every new
+   object in `OMNATA_PLUGIN_DEVELOPMENT` owned by `OMNATA_PLUGIN_DEVELOPMENT_ROLE`, which the
+   application holds, so no grants are needed. Do not create schema-level future grants that
+   override this -- the engine rejects draft objects not owned by the development role.
+
+4. **External access integrations and secrets are bound by the engine, not by you.** Creating or
+   altering an object leaves it without the connection's external access integrations and secrets
+   (a `CREATE OR REPLACE`/`CREATE OR ALTER` without those clauses drops any existing binding).
+   Before every call into a version -- connection tests, LIST_STREAMS and other configuration calls,
+   and at the start of every sync run -- the engine runs its rebind step, which applies the EAIs and
+   secrets of every active connection of the plugin to every procedure and Python/Java function in
+   that version's schema. So code changed directly is bound again the next time the engine uses it.
+   The secrets themselves always stay in the plugin's home schema; code in later version schemas
+   reaches them through this binding. Consequence: if you `CALL` a procedure directly that reads
+   connection secrets or makes outbound calls, it may fail with "Secret ... not found" or a network
+   error until the engine has rebound it. Test such procedures through the engine (the plugin
+   builder UI / connection wizard, or `RUN_SYNC`) rather than by direct invocation.
+
+5. **Record that the object has been authored**, so the plugin builder UI shows it as created:
+   ```sql
+   CALL OMNATA_SYNC_ENGINE.API.SET_PLUGIN_OBJECT_DEVELOPMENT_STATE(
+       '<PLUGIN_FQN>', '<OBJECT_NAME>', 'creation_state', 'created');
+   ```
+
+6. **Verify deployment**:
+   ```sql
+   SHOW USER PROCEDURES IN SCHEMA <plugin database>.<draft schema>;
+   SHOW USER FUNCTIONS IN SCHEMA <plugin database>.<draft schema>;
+   ```
+   and confirm `DESCRIBE PROCEDURE ...` shows `execute as` = `OWNER`.
+
+`API.SAVE_PLUGIN_STORED_PROCEDURE(<PLUGIN_FQN>, <NAME>, <python_body>, <packages_json>)` still exists
+and does steps 2-5 for the standard objects in one call (it writes to the draft and rebinds), but
+direct creation is preferred: it supports any signature, handler or additional helper objects.
+
+### Step 4b: Publish the Version
+
+Syncs run published versions. When the draft is tested and the user is ready, publish it -- this
+locks it (ownership moves to the published role and the definitions are captured):
+```sql
+CALL OMNATA_SYNC_ENGINE.API.PUBLISH_PLUGIN_VERSION('<PLUGIN_FQN>', '<release notes>');
+```
+Only publish with the user's agreement. Further changes need a new draft (Step 4, action 2).
 
 ### Step 5: Test the Procedure
 
@@ -309,7 +381,7 @@ CALL OMNATA_SYNC_ENGINE.API.SET_PLUGIN_OBJECT_DEVELOPMENT_STATE(
 ```
 Where `<OBJECT_NAME>` is the procedure/function name being tested (e.g. `CONNECTION_TEST`,
 `FETCH_RECORD_PAGE` -- the names from Step 2). You do not need to set `creation_state`:
-`SAVE_PLUGIN_STORED_PROCEDURE` marks the object as `created` automatically when you deploy it.
+set it in Step 4 (action 5) when you create the object.
 
 **Step-by-step mode**: STOP -- report results to the user.
 
@@ -497,7 +569,7 @@ Wait for the user to confirm they made a change.
 
 - Read the failing procedure body: `SELECT GET_DDL('PROCEDURE', '...');`
 - Identify the bug from the error message and procedure code.
-- Write the fix and redeploy via `SAVE_PLUGIN_STORED_PROCEDURE` (Step 4).
+- Write the fix and redeploy into the draft version schema (Step 4). If the sync is pinned to a published version, the fix will not take effect until the draft is published and the sync uses it (or run a branch against the draft).
 - Loop back to step 1 of this cycle.
 
 **7. After 5 failed iterations:**
@@ -537,14 +609,22 @@ A deployed and tested Omnata plugin, optionally with a working end-to-end test s
 ### Common Issues
 
 1. **"success": false in response** -- Read the error message. Common causes:
-   - Missing or incorrect package in the packages JSON
+   - Missing or incorrect package in the PACKAGES clause
    - Import errors in the procedure body
    - Parameter type mismatches
 
-2. **Procedure not appearing after save** -- Verify:
-   - The PLUGIN_FQN is correct
-   - You have sufficient privileges
-   - Check `SHOW USER PROCEDURES IN SCHEMA <schema>`
+2. **Procedure not being used** -- Verify:
+   - It was created in the **draft** schema from `DATA_VIEWS.PLUGIN_VERSION`, not the home schema of a published version
+   - It is owned by `OMNATA_PLUGIN_DEVELOPMENT_ROLE` (`SHOW USER PROCEDURES IN SCHEMA <schema>`)
+   - It is `EXECUTE AS OWNER`
+   - The sync/branch runs the draft version (syncs normally run the latest published version)
+
+6. **"Secret ... not found" or network errors when calling a procedure directly** -- the object was
+   created/altered after the engine last bound it. Test via the engine (UI or `RUN_SYNC`), which
+   rebinds before each call.
+
+7. **"... is published and locked" / ownership errors** -- you tried to change a published version.
+   Create a draft with `CREATE_PLUGIN_DRAFT_VERSION` and write there.
 
 3. **Decorator errors** -- Ensure `omnata-plugin-runtime` is included in the packages JSON
 
@@ -559,6 +639,8 @@ A deployed and tested Omnata plugin, optionally with a working end-to-end test s
 
 - **Document exact signatures:** For each plugin procedure, the reference doc specifies the exact SQL signature the engine calls and the expected return shape. Always match these exactly.
 - **Prefer plain `run(session, ...)` functions** returning the documented dict over `omnata_plugin_runtime` decorators, unless the decorator's expected input exactly matches what the engine passes. Decorators that unpack a single OBJECT payload will fail if the engine passes positional arguments instead.
-- Procedures are not created directly with CREATE PROCEDURE -- always use `SAVE_PLUGIN_STORED_PROCEDURE` since external access integrations and secrets must be attached.
+- Create procedures and functions directly (`CREATE OR ALTER`) in the plugin's **draft version schema** from `DATA_VIEWS.PLUGIN_VERSION`. Never write to a published version.
+- Every stored procedure must be `EXECUTE AS OWNER`; the engine refuses to run a version that contains a caller's rights procedure.
+- Do not attach external access integrations or secrets yourself; the engine rebinds them before each call into a version.
 - The `omnata-plugin-runtime` package is available from PyPi.
 - Existing procedures for other plugins can be a useful reference point, but if at any point they clash with this skill's reference docs, the reference docs take precedence. The engine will call the procedure with the documented signature, and the procedure must return the documented shape.
