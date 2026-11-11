@@ -6,7 +6,7 @@ until a call returns no records. Each call fetches a single page of records from
 system and yields them along with the updated stream state.
 
 It lives in the plugin's schema (for interactive plugins:
-`OMNATA_PLUGIN_DEVELOPMENT.<PLUGIN_ID>.FETCH_RECORD_PAGE`) and is generated with the
+`OMNATA_PLUGIN_DEVELOPMENT.<draft version schema>.FETCH_RECORD_PAGE`) and is generated with the
 `@inbound_sync_rest_paginated_handler` decorator from `omnata_plugin_runtime.decorators`, applied
 to a handler class named `FetchRecordPage`.
 
