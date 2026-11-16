@@ -20,28 +20,43 @@ Use this skill when the user wants to:
 ## Prerequisites
 
 - Active Snowflake connection with access to `OMNATA_SYNC_ENGINE` application. The user may advise that the application is installed under a different name, but this is the default.
-- There are a series of initial setup steps before any plugin development can be done. The status of these can be checked by calling this proc:
+- Plugin development uses two databases (architecture v2):
+  - The **development database** (default `OMNATA_PLUGIN_DEVELOPMENT`) is **owned by the customer**.
+    Each plugin's draft is a schema in it, and every object in it is owned by its database role
+    `OMNATA_PLUGIN_DEVELOPMENT_ROLE` (through future ownership grants). That role is granted to the
+    application and to developers. **This is the only place you write code.**
+  - The **published versions database** (default `OMNATA_PLUGIN_PUBLISHED_VERSIONS`) is **owned by
+    the application**. Each plugin has a home schema there, holding its connection secrets and network
+    rules and no code. Version *n* is the locked schema `<home schema>__V<n>`, owned by the app-owned
+    database role `OMNATA_PLUGIN_PUBLISHED_ROLE`. You can't and mustn't write to it.
+- Both names are configurable per installation, so **never assume the default names**. At the start of
+  each session, read them from the application's settings and use the result wherever this skill says
+  `<development database>` or `<published versions database>`:
+```sql
+select SETTING_VALUE:"development_database"::varchar as PLUGIN_DEVELOPMENT_DATABASE,
+       SETTING_VALUE:"published_versions_database"::varchar as PLUGIN_PUBLISHED_VERSIONS_DATABASE
+from OMNATA_SYNC_ENGINE.DATA_VIEWS.APP_SETTINGS
+where SETTING_NAME = 'plugin_development';
+```
+- Some setup steps have to be done before any plugin development. Check their status with:
 ```
 call OMNATA_SYNC_ENGINE.API.CHECK_PLUGIN_DEVELOPMENT_SETUP();
 ```
-It returns a structure like so:
-```
-{
-  "success": true,
-  "checks": {
-    "database_accessible": true,    # if false, create a database named OMNATA_PLUGIN_DEVELOPMENT and grant usage to the OMNATA_SYNC_ENGINE application
-    "database_role_exists": true,   # if false, create a database role named OMNATA_PLUGIN_DEVELOPMENT.OMNATA_PLUGIN_DEVELOPMENT_ROLE
-    "role_granted_to_app": true,    # if false, grant usage of the database role OMNATA_PLUGIN_DEVELOPMENT.OMNATA_PLUGIN_DEVELOPMENT_ROLE to the OMNATA_SYNC_ENGINE application
-    "create_schema_grant": true,    # if false, `GRANT CREATE SCHEMA ON DATABASE OMNATA_PLUGIN_DEVELOPMENT TO DATABASE ROLE OMNATA_PLUGIN_DEVELOPMENT`
-    "future_schema_grant": true,    # if false, `GRANT OWNERSHIP ON FUTURE SCHEMAS IN DATABASE OMNATA_PLUGIN_DEVELOPMENT TO DATABASE ROLE OMNATA_PLUGIN_DEVELOPMENT.OMNATA_PLUGIN_DEVELOPMENT_ROLE`
-    "future_procedure_grant": true, # if false, `GRANT OWNERSHIP ON FUTURE PROCEDURES IN DATABASE OMNATA_PLUGIN_DEVELOPMENT TO DATABASE ROLE OMNATA_PLUGIN_DEVELOPMENT.OMNATA_PLUGIN_DEVELOPMENT_ROLE`
-    "future_function_grant": true, # if false, `GRANT OWNERSHIP ON FUTURE FUNCTIONS IN DATABASE OMNATA_PLUGIN_DEVELOPMENT TO DATABASE ROLE OMNATA_PLUGIN_DEVELOPMENT.OMNATA_PLUGIN_DEVELOPMENT_ROLE`
-    "future_secret_grant": true,   # if false, `GRANT OWNERSHIP ON FUTURE SECRETS IN DATABASE OMNATA_PLUGIN_DEVELOPMENT TO DATABASE ROLE OMNATA_PLUGIN_DEVELOPMENT.OMNATA_PLUGIN_DEVELOPMENT_ROLE`
-    "pypi_repository_user_granted": true # if false, `GRANT DATABASE ROLE SNOWFLAKE.PYPI_REPOSITORY_USER TO APPLICATION OMNATA_SYNC_ENGINE`
-  },
-  "allReady": true
-}
-```
+  It returns a `checks` map of boolean flags, `all_ready`, `database_exists` (whether the development
+  database exists and the application can see it), `ready_for_development` and `app_name`.
+  - The application provisions the published versions database and its role itself
+    (`CALL OMNATA_SYNC_ENGINE.API.CREATE_PLUGIN_DEVELOPMENT_DB()`).
+  - An administrator must grant the application `CREATE DATABASE` and
+    `SNOWFLAKE.PYPI_REPOSITORY_USER`.
+  - An administrator must also create the development database, using the name from the setting
+    above, with:
+    - `OMNATA_PLUGIN_DEVELOPMENT_ROLE`
+    - `GRANT CREATE SCHEMA` and future ownership grants on schemas, procedures and functions to that
+      role
+    - `GRANT DATABASE ROLE <development database>.OMNATA_PLUGIN_DEVELOPMENT_ROLE TO APPLICATION OMNATA_SYNC_ENGINE`
+
+    The Omnata UI's plugin development onboarding shows this SQL. Don't make these grants yourself
+    unless the user asks you to.
 If locally developed plugins already exist, there is no need to run the checks up-front as the setup is already complete.
 
 ## Setup
@@ -104,8 +119,12 @@ Store the chosen mode and design approach as context for all subsequent steps.
    ```sql
    SELECT *
    FROM OMNATA_SYNC_ENGINE.DATA_VIEWS.PLUGIN
-   WHERE DATABASE = 'OMNATA_PLUGIN_DEVELOPMENT'
+   WHERE PLUGIN_STYLE = 'interactive'
    ORDER BY NAME;
+   ```
+   For an interactive plugin, `DATABASE`/`SCHEMA` in this view point at the plugin's **published
+   home** in the published versions database, not at the draft. The draft is the schema of the same
+   name in the development database.
    ```
 
 2. **Present** the list to the user and ask which plugin to work on (or if creating a new one).
@@ -258,39 +277,42 @@ After this, the sync-related procedures can be implemented and tested, using the
 
 ### Step 4: Deploy the Procedure
 
-**Goal:** Create or update the procedure/function directly in the plugin's **draft version schema**.
+**Goal:** Create or update the procedure/function directly in the plugin's **draft schema**.
 
-Plugins are versioned. Each version has its own schema, at most one version is a draft, and published
-versions are locked (owned by `OMNATA_PLUGIN_DEVELOPMENT.OMNATA_PLUGIN_PUBLISHED_ROLE`, which only the
-application holds). You write code into the draft only, using plain `CREATE OR ALTER` /
-`CREATE OR REPLACE` statements -- there is no need to go through an Omnata API procedure.
+Plugins are versioned. The draft is the plugin's schema in the customer-owned development database,
+and it's where all changes are made. Publishing copies the draft into a new, locked version schema
+in the published versions database. Write code into the draft only, using plain `CREATE OR ALTER` /
+`CREATE OR REPLACE` statements. You don't need to go through an Omnata API procedure.
 
 **Actions:**
 
 1. **Prerequisite: the plugin must be registered first** via `CONFIGURE_DEVELOPMENT_PLUGIN` (Step 1).
+   Its result includes `development_database` and `schema`.
 
-2. **Determine the version schema to write to.** Look up the plugin's draft version:
+2. **Determine where to write.** The draft is `<development database>.<SCHEMA>`:
+   - `<development database>` comes from the `plugin_development` app setting (see Prerequisites).
+   - `<SCHEMA>` is the plugin's `SCHEMA` in `OMNATA_SYNC_ENGINE.DATA_VIEWS.PLUGIN`.
+
+   To see the draft, its objects and how each differs from the latest published version, call:
    ```sql
-   SELECT VERSION_NUMBER, VERSION_STATE, SCHEMA
-   FROM OMNATA_SYNC_ENGINE.DATA_VIEWS.PLUGIN_VERSION
-   WHERE PLUGIN_FQN = '<PLUGIN_FQN>' AND VERSION_STATE != 'deleted'
-   ORDER BY VERSION_NUMBER;
+   CALL OMNATA_SYNC_ENGINE.API.LIST_PLUGIN_VERSIONS('<PLUGIN_FQN>');
    ```
-   - If a row has `VERSION_STATE = 'draft'`, write to `<plugin database>.<that SCHEMA>`.
-   - If every version is `published`, create a new draft first (it clones the latest published
-     version, or `BASED_ON_VERSION_NUMBER` if given), then re-run the query above:
+   - `DRAFT.EXISTS = false` means the draft schema is missing, for example because it was dropped.
+     Recreate it from a published version, then write to it:
      ```sql
-     CALL OMNATA_SYNC_ENGINE.API.CREATE_PLUGIN_DRAFT_VERSION('<PLUGIN_FQN>', NULL, '<what is changing>');
+     CALL OMNATA_SYNC_ENGINE.API.CREATE_PLUGIN_DRAFT_FROM_VERSION('<PLUGIN_FQN>', <version number>);
      ```
-   - If no rows are returned at all, the plugin pre-dates versioning: use the `SCHEMA` from
-     `OMNATA_SYNC_ENGINE.DATA_VIEWS.PLUGIN`.
+   - `MIGRATION_PENDING = true` means the installation hasn't yet been migrated to the two-database
+     layout. Stop and tell the user. Don't write code until it's been migrated.
 
-   For reference, version 1 lives in the plugin's home schema (the `SCHEMA` in the PLUGIN view, e.g.
-   `NOTION_V2`) and version *n* lives in `<home schema>__V<n>` (e.g. `NOTION_V2__V3`). Always read
-   the schema from `PLUGIN_VERSION` rather than constructing it. Never attempt to modify a published
-   version's schema -- it will fail with an ownership error, and any change would be detected and
-   block the syncs pinned to it. `PLUGIN_FQN` here is the **logical** FQN (the `FQN` column in the
-   PLUGIN view, e.g. `OMNATA__NOTION_V2`), not the database.schema path.
+   Published version *n* lives in `<published versions database>.<SCHEMA>__V<n>`. Never try to
+   modify a published version: it fails with an ownership error, and any change would be detected
+   and block the syncs pinned to it. To release the draft, publish it, either from the Omnata UI or
+   with `CALL OMNATA_SYNC_ENGINE.API.PUBLISH_PLUGIN_VERSION('<PLUGIN_FQN>', '<notes>')`, but only when
+   the user asks you to.
+
+   `PLUGIN_FQN` is the **logical** FQN (the `FQN` column in the PLUGIN view, e.g.
+   `OMNATA__NOTION_V2`), not a database.schema path.
 
 3. **Create the object.** Use the exact signature from the reference doc. Stored procedures **must**
    be declared `EXECUTE AS OWNER` -- the engine checks every procedure before using a version and
@@ -301,7 +323,7 @@ application holds). You write code into the draft only, using plain `CREATE OR A
    Procedure (CONNECTION_FORM, NETWORK_ADDRESSES, CONNECTION_TEST, LIST_STREAMS,
    INBOUND_SYNC_PARAMETERS, OUTBOUND_SYNC_PARAMETERS, ...):
    ```sql
-   CREATE OR ALTER PROCEDURE <plugin database>.<draft schema>.CONNECTION_TEST(PARAMETERS OBJECT)
+   CREATE OR ALTER PROCEDURE <development database>.<SCHEMA>.CONNECTION_TEST(PARAMETERS OBJECT)
    RETURNS OBJECT
    LANGUAGE PYTHON
    RUNTIME_VERSION = '3.11'
@@ -317,9 +339,9 @@ application holds). You write code into the draft only, using plain `CREATE OR A
    RETURNS TABLE (...)` with the handler class name from the reference doc (`FetchRecordPage`,
    `ApplyRecordBatch`). `EXECUTE AS` does not apply to functions.
 
-   Ownership is assigned automatically: future grants configured during setup make every new
-   object in `OMNATA_PLUGIN_DEVELOPMENT` owned by `OMNATA_PLUGIN_DEVELOPMENT_ROLE`, which the
-   application holds, so no grants are needed. Do not create schema-level future grants that
+   Ownership is assigned automatically. The future grants configured during setup make every new
+   object in the development database owned by `OMNATA_PLUGIN_DEVELOPMENT_ROLE`, and the application
+   holds that role, so no grants are needed. Do not create schema-level future grants that
    override this -- the engine rejects draft objects not owned by the development role.
 
 4. **External access integrations and secrets are bound by the engine, not by you.** Creating or
@@ -329,8 +351,8 @@ application holds). You write code into the draft only, using plain `CREATE OR A
    and at the start of every sync run -- the engine runs its rebind step, which applies the EAIs and
    secrets of every active connection of the plugin to every procedure and Python/Java function in
    that version's schema. So code changed directly is bound again the next time the engine uses it.
-   The secrets themselves always stay in the plugin's home schema; code in later version schemas
-   reaches them through this binding. Consequence: if you `CALL` a procedure directly that reads
+   The secrets always stay in the plugin's home schema in the published versions database. The draft
+   and every version schema reach them through this binding. Consequence: if you `CALL` a procedure directly that reads
    connection secrets or makes outbound calls, it may fail with "Secret ... not found" or a network
    error until the engine has rebound it. Test such procedures through the engine (the plugin
    builder UI / connection wizard, or `RUN_SYNC`) rather than by direct invocation.
@@ -354,12 +376,14 @@ direct creation is preferred: it supports any signature, handler or additional h
 
 ### Step 4b: Publish the Version
 
-Syncs run published versions. When the draft is tested and the user is ready, publish it -- this
-locks it (ownership moves to the published role and the definitions are captured):
+Syncs run published versions. When the draft is tested and the user is ready, publish it. This
+copies the draft into `<published versions database>.<SCHEMA>__V<n>` and locks the copy: ownership
+moves to `OMNATA_PLUGIN_PUBLISHED_ROLE` and the definitions are captured. The draft stays in the
+development database and remains editable:
 ```sql
 CALL OMNATA_SYNC_ENGINE.API.PUBLISH_PLUGIN_VERSION('<PLUGIN_FQN>', '<release notes>');
 ```
-Only publish with the user's agreement. Further changes need a new draft (Step 4, action 2).
+Only publish with the user's agreement. Further changes go into the same draft, then you publish again.
 
 ### Step 5: Test the Procedure
 
@@ -569,7 +593,7 @@ Wait for the user to confirm they made a change.
 
 - Read the failing procedure body: `SELECT GET_DDL('PROCEDURE', '...');`
 - Identify the bug from the error message and procedure code.
-- Write the fix and redeploy into the draft version schema (Step 4). If the sync is pinned to a published version, the fix will not take effect until the draft is published and the sync uses it (or run a branch against the draft).
+- Write the fix and redeploy into the draft schema in the development database (Step 4). If the sync is pinned to a published version, the fix will not take effect until the draft is published and the sync uses it (or run a branch against the draft).
 - Loop back to step 1 of this cycle.
 
 **7. After 5 failed iterations:**
@@ -614,8 +638,8 @@ A deployed and tested Omnata plugin, optionally with a working end-to-end test s
    - Parameter type mismatches
 
 2. **Procedure not being used** -- Verify:
-   - It was created in the **draft** schema from `DATA_VIEWS.PLUGIN_VERSION`, not the home schema of a published version
-   - It is owned by `OMNATA_PLUGIN_DEVELOPMENT_ROLE` (`SHOW USER PROCEDURES IN SCHEMA <schema>`)
+   - It was created in the draft (`<development database>.<SCHEMA>`), not in the published versions database
+   - It is owned by `OMNATA_PLUGIN_DEVELOPMENT_ROLE` (`SHOW USER PROCEDURES IN SCHEMA <development database>.<SCHEMA>`)
    - It is `EXECUTE AS OWNER`
    - The sync/branch runs the draft version (syncs normally run the latest published version)
 
@@ -624,7 +648,8 @@ A deployed and tested Omnata plugin, optionally with a working end-to-end test s
    rebinds before each call.
 
 7. **"... is published and locked" / ownership errors** -- you tried to change a published version.
-   Create a draft with `CREATE_PLUGIN_DRAFT_VERSION` and write there.
+   Write to the draft in the development database instead. If the draft is missing, recreate it with
+   `CREATE_PLUGIN_DRAFT_FROM_VERSION`.
 
 3. **Decorator errors** -- Ensure `omnata-plugin-runtime` is included in the packages JSON
 
@@ -639,7 +664,7 @@ A deployed and tested Omnata plugin, optionally with a working end-to-end test s
 
 - **Document exact signatures:** For each plugin procedure, the reference doc specifies the exact SQL signature the engine calls and the expected return shape. Always match these exactly.
 - **Prefer plain `run(session, ...)` functions** returning the documented dict over `omnata_plugin_runtime` decorators, unless the decorator's expected input exactly matches what the engine passes. Decorators that unpack a single OBJECT payload will fail if the engine passes positional arguments instead.
-- Create procedures and functions directly (`CREATE OR ALTER`) in the plugin's **draft version schema** from `DATA_VIEWS.PLUGIN_VERSION`. Never write to a published version.
+- Create procedures and functions directly (`CREATE OR ALTER`) in the plugin's **draft schema**, `<development database>.<SCHEMA>`, using the database name from the `plugin_development` app setting. Never write to a published version.
 - Every stored procedure must be `EXECUTE AS OWNER`; the engine refuses to run a version that contains a caller's rights procedure.
 - Do not attach external access integrations or secrets yourself; the engine rebinds them before each call into a version.
 - The `omnata-plugin-runtime` package is available from PyPi.

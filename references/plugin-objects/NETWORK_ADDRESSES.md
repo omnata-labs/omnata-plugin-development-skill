@@ -36,7 +36,7 @@ call <plugin database>.<plugin schema>.NETWORK_ADDRESSES(OBJECT_CONSTRUCT(
 ));
 ```
 
-`<plugin schema>` is the plugin's draft version schema (see Step 4 of SKILL.md). No grant is needed: the procedure is owned by `OMNATA_PLUGIN_DEVELOPMENT_ROLE`, which the application holds. Procedures that read connection secrets are only bound to them once the engine has called into the version, so test those via the engine.
+`<plugin schema>` is the plugin's draft schema in the development database (see Step 4 of SKILL.md). No grant is needed: the procedure is owned by `OMNATA_PLUGIN_DEVELOPMENT_ROLE`, which the application holds. Procedures that read connection secrets are only bound to them once the engine has called into the version, so test those via the engine.
 
 The correct behaviour of the stored proc can be verified by taking the 'data' result field value and performing a Pydantic validation:
 ```
